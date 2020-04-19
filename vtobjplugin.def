@@ -1,0 +1,6 @@
+LIBRARY      "vtobjplugin"
+DESCRIPTION  'Fuck Virtools'
+
+EXPORTS
+	GetVirtoolsPluginInfoCount
+	GetVirtoolsPluginInfo
