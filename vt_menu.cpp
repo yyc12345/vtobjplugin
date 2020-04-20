@@ -59,8 +59,17 @@ void PluginMenuCallback(int commandID) {
 		return;
 	}
 
-
-
+	switch (es->res_settings->export_mode) {
+		case EXPORTMODE_ALL:
+			ExportAllWarpper(ctx, es->res_settings);
+			break;
+		case EXPORTMODE_GROUP:
+			ExportGroupWarpper(ctx, es->res_settings);
+			break;
+		case EXPORTMODE_OBJECT:
+			ExportObjectWarpper(ctx, es->res_settings);
+			break;
+	}
 
 	ctx->OutputToConsole("[vtobjplugin] Export OK!");
 	delete es;

@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include <afxdialogex.h>
 #include <vector>
+#include "obj_export.h"
 // ExportSetting 对话框
 
 class ExportSetting : public CDialogEx {
@@ -34,25 +35,21 @@ class ExportSetting : public CDialogEx {
 	CButton m_ExportMode_All;	
 	CComboBox m_ExportList;
 	CButton m_RightHand;
+	CButton m_CustomTextureFormat;
+	CButton m_SaveAlpha;
 	virtual BOOL OnInitDialog();
 	afx_msg void func_ExportFolderBroswer();
 	afx_msg void func_DialogOK();
 	afx_msg void func_DialogCancel();
 	afx_msg void func_ChangeExportMode(UINT nID);
 
-	char* res_ExportFolder;
-	BOOL res_OmitTransform;
-	BOOL res_ExportMtl;
-	BOOL res_ExportTexture;
-	BOOL res_RightHand;
-	char* res_TextureFormat;
-	CK_ID res_SelectedItem;
-	int res_ExportMode;//0-obj, 1-group, 2-all
+	ExportConfig* res_settings;
 
 	private:
 	CKContext* context;
 	std::vector<CK_ID> comboboxMirror;
 	int cache_ExportMode;
+
 };
 
 
