@@ -74,7 +74,7 @@ void ExportObject(FILE* fs, CK3dEntity* obj, ExportConfig* cfg, std::set<CK_ID>*
 	//vn
 	for (int i = 0; i < count; i++) {
 		mesh->GetVertexNormal(i, &cacheVec1);
-		fprintf(fs, "vt %f %f %f\n", cacheVec1.x, cacheVec1.y, cacheVec1.z * global_reverse);
+		fprintf(fs, "vn %f %f %f\n", cacheVec1.x, cacheVec1.y, cacheVec1.z * global_reverse);
 	}
 
 	//g
@@ -101,9 +101,9 @@ void ExportObject(FILE* fs, CK3dEntity* obj, ExportConfig* cfg, std::set<CK_ID>*
 		i2 = (int)fIndices[i * 3 + 1] + 1 + voffset;
 		i3 = (int)fIndices[i * 3 + 2] + 1 + voffset;
 		fprintf(fs, "f %d/%d/%d %d/%d/%d %d/%d/%d\n",
-			i1, i1, i1,
+			i3, i3, i3,
 			i2, i2, i2,
-			i3, i3, i3);
+			i1, i1, i1);
 	}
 
 }
