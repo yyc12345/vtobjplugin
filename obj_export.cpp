@@ -5,6 +5,8 @@
 obj_export::obj_export() {
 	fObj = NULL;
 	fMtl = NULL;
+	frepos_3dsmax = NULL;
+	frepos_blender = NULL;
 	cfg = NULL;
 	ctx = NULL;
 	matList = new std::set<CK_ID>();
@@ -20,8 +22,8 @@ obj_export::~obj_export() {
 }
 
 void obj_export::Ready4Export(CKContext* ctx, ExportConfig* cfg) {
-	this->ctx = ctx; 
-	this->cfg = cfg; 
+	this->ctx = ctx;
+	this->cfg = cfg;
 	matList->clear();
 }
 void obj_export::ExportAllWarpper() {
@@ -32,11 +34,13 @@ void obj_export::ExportAllWarpper() {
 	int storedV = 0;
 	StartFile(&fObj, "obj");
 	StartFile(&fMtl, "mtl");
+	StartReposition();
 
 	for (int i = 0; i < count; i++) {
 		obj = (CK3dEntity*)objArray[i];
 		NextFile(&fObj, obj->GetName(), "obj");
 		ExportObject(obj, &storedV);
+		NextRepostion(obj);
 
 		// if multifile, export here for each object
 		if (cfg->file_mode == FILEMODE_MULTIFILE) {
@@ -49,6 +53,7 @@ void obj_export::ExportAllWarpper() {
 	//if one file, export mtl here to make sure some material can be shared using
 	ExportMaterial();
 
+	EndRepostition();
 	EndFile(&fObj);
 	EndFile(&fMtl);
 }
@@ -61,6 +66,7 @@ void obj_export::ExportGroupWarpper() {
 	int storedV = 0;
 	StartFile(&fObj, "obj");
 	StartFile(&fMtl, "mtl");
+	StartReposition();
 
 	for (int i = 0; i < count; i++) {
 		obj = (CK3dEntity*)objArray[i];
@@ -68,6 +74,7 @@ void obj_export::ExportGroupWarpper() {
 
 		NextFile(&fObj, obj->GetName(), "obj");
 		ExportObject(obj, &storedV);
+		NextRepostion(obj);
 
 		// if multifile, export here for each object
 		if (cfg->file_mode == FILEMODE_MULTIFILE) {
@@ -80,6 +87,7 @@ void obj_export::ExportGroupWarpper() {
 	//if one file, export mtl here to make sure some material can be shared using
 	ExportMaterial();
 
+	EndRepostition();
 	EndFile(&fObj);
 	EndFile(&fMtl);
 }
@@ -87,19 +95,75 @@ void obj_export::ExportObjectWarpper() {
 	//obj mtl
 	StartFile(&fObj, "obj");
 	StartFile(&fMtl, "mtl");
+	StartReposition();
 
 	int storedV = 0;
 	CK3dEntity* obj = (CK3dEntity*)ctx->GetObjectA(cfg->selected_item);
 	NextFile(&fObj, obj->GetName(), "obj");
 	ExportObject(obj, &storedV);
+	NextRepostion(obj);
 	if (cfg->export_mtl) {
 		NextFile(&fMtl, obj->GetName(), "mtl");
 		ExportMaterial();
 	}
 
+	EndRepostition();
 	EndFile(&fObj);
 	EndFile(&fMtl);
 
+}
+
+
+void obj_export::StartReposition() {
+	if ((!cfg->omit_transform) || (!cfg->right_hand)) return;
+
+	if (cfg->reposition_3dsmax) {
+		strcpy(path_help, cfg->export_folder);
+		strcat(path_help, "\\3dsmax.ms");
+		frepos_3dsmax = fopen(path_help, "w");
+		if (frepos_3dsmax == NULL) throw std::bad_alloc();
+	}
+	if (cfg->reposition_blender) {
+		strcpy(path_help, cfg->export_folder);
+		strcat(path_help, "\\blender.py");
+		frepos_blender = fopen(path_help, "w");
+		if (frepos_blender == NULL) throw std::bad_alloc();
+
+		//write header
+		fputs("import bpy\n", frepos_blender);
+		fputs("from mathutils import Matrix\n", frepos_blender);
+		fputs("def tryModify(obj, mat):\n", frepos_blender);
+		fputs("    try:\n", frepos_blender);
+		fputs("        bpy.data.objects[obj].matrix_world = mat.transposed()\n", frepos_blender);
+		fputs("    except:\n", frepos_blender);
+		fputs("        pass\n", frepos_blender);
+	}
+}
+void obj_export::NextRepostion(CK3dEntity* obj) {
+	if (frepos_3dsmax != NULL) {
+		//todo: finish 3ds max repostion export
+	}
+	if (frepos_blender != NULL) {
+		VxMatrix cacheMat = obj->GetWorldMatrix();
+		GenerateObjName(obj, name_help);
+		fprintf(frepos_blender, "tryModify('%s', Matrix(((%f, %f, %f, %f), (%f, %f, %f, %f), (%f, %f, %f, %f), (%f, %f, %f, %f))))\n",
+			name_help,
+			cacheMat[0][0], cacheMat[0][2], cacheMat[0][1], cacheMat[0][3],
+			cacheMat[2][0], cacheMat[2][2], cacheMat[2][1], cacheMat[2][3],
+			cacheMat[1][0], cacheMat[1][2], cacheMat[1][1], cacheMat[1][3],
+			cacheMat[3][0], cacheMat[3][2], cacheMat[3][1], cacheMat[3][3]);
+	}
+}
+void obj_export::EndRepostition() {
+	if (frepos_3dsmax != NULL) {
+		fclose(frepos_3dsmax);
+		frepos_3dsmax = NULL;
+	}
+
+	if (frepos_blender != NULL) {
+		fclose(frepos_blender);
+		frepos_blender = NULL;
+	}
 }
 
 void obj_export::StartFile(FILE** fs, char* suffix) {
@@ -129,8 +193,6 @@ void obj_export::EndFile(FILE** fs) {
 		fclose(*fs);
 		*fs = NULL;
 	}
-		
-	
 }
 
 
@@ -140,7 +202,6 @@ void obj_export::ExportObject(CK3dEntity* obj, int* storedV) {
 	CKMesh* mesh = obj->GetCurrentMesh();
 	int count = mesh->GetVertexCount();
 	(*storedV) += count;
-	float global_reverse = cfg->right_hand ? -1.0f : 1.0f;
 
 	//mtllib
 	if (voffset == 0) {
@@ -153,16 +214,19 @@ void obj_export::ExportObject(CK3dEntity* obj, int* storedV) {
 			fprintf(fObj, "mtllib %s.mtl\n", name_help);
 	}
 
+#define righthand_pos_converter(condition,y,z) (condition ? z : y), (condition ? y : z)
+#define righthand_uv_converter(condition,u,v) u, (condition ? -v : v)
+
 	//v
 	VxVector cacheVec1, cacheVec2;
 	VxMatrix cacheMat = obj->GetWorldMatrix();
 	for (int i = 0; i < count; i++) {
 		mesh->GetVertexPosition(i, &cacheVec1);
 		if (cfg->omit_transform) {
-			fprintf(fObj, "v %f %f %f\n", cacheVec1.x, cacheVec1.y, cacheVec1.z * global_reverse);
+			fprintf(fObj, "v %f %f %f\n", cacheVec1.x, righthand_pos_converter(cfg->right_hand, cacheVec1.y, cacheVec1.z));
 		} else {
 			Vx3DMultiplyMatrixVector(&cacheVec2, cacheMat, &cacheVec1);
-			fprintf(fObj, "v %f %f %f\n", cacheVec2.x, cacheVec2.y, cacheVec2.z * global_reverse);
+			fprintf(fObj, "v %f %f %f\n", cacheVec2.x, righthand_pos_converter(cfg->right_hand, cacheVec2.y, cacheVec2.z));
 		}
 	}
 
@@ -170,13 +234,13 @@ void obj_export::ExportObject(CK3dEntity* obj, int* storedV) {
 	float u, v;
 	for (int i = 0; i < count; i++) {
 		mesh->GetVertexTextureCoordinates(i, &u, &v);
-		fprintf(fObj, "vt %f %f 0\n", u, v * global_reverse);
+		fprintf(fObj, "vt %f %f 0\n", righthand_uv_converter(cfg->right_hand, u, v));
 	}
 
 	//vn
 	for (int i = 0; i < count; i++) {
 		mesh->GetVertexNormal(i, &cacheVec1);
-		fprintf(fObj, "vn %f %f %f\n", cacheVec1.x, cacheVec1.y, cacheVec1.z * global_reverse);
+		fprintf(fObj, "vn %f %f %f\n", cacheVec1.x, righthand_pos_converter(cfg->right_hand, cacheVec1.y, cacheVec1.z));
 	}
 
 	//g
@@ -202,10 +266,18 @@ void obj_export::ExportObject(CK3dEntity* obj, int* storedV) {
 		i1 = (int)fIndices[i * 3] + 1 + voffset;
 		i2 = (int)fIndices[i * 3 + 1] + 1 + voffset;
 		i3 = (int)fIndices[i * 3 + 2] + 1 + voffset;
-		fprintf(fObj, "f %d/%d/%d %d/%d/%d %d/%d/%d\n",
-			i3, i3, i3,
-			i2, i2, i2,
-			i1, i1, i1);
+		if (cfg->right_hand) {
+			fprintf(fObj, "f %d/%d/%d %d/%d/%d %d/%d/%d\n",
+				i3, i3, i3,
+				i2, i2, i2,
+				i1, i1, i1);
+		} else {
+			fprintf(fObj, "f %d/%d/%d %d/%d/%d %d/%d/%d\n",
+				i1, i1, i1,
+				i2, i2, i2,
+				i3, i3, i3);
+		}
+
 	}
 
 }
@@ -270,7 +342,9 @@ void obj_export::GenerateTextureName(CKTexture* obj, char* name, char* suffix) {
 void obj_export::ObjectNameUniform(char* str) {
 	int len = strlen(str);
 	for (int i = 0; i < len; i++) {
-		if (str[i] == ' ')
+		if (str[i] == ' ' ||
+			str[i] == '\'' ||
+			str[i] == '"')
 			str[i] = '_';
 	}
 }
@@ -285,6 +359,7 @@ void obj_export::FileNameUniform(char* str) {
 			str[i] == '"' ||
 			str[i] == '<' ||
 			str[i] == '>' ||
+			str[i] == '\'' ||
 			str[i] == '|')
 			str[i] = '_';
 	}

@@ -46,6 +46,10 @@ class obj_export {
 	void ExportObjectWarpper();
 
 	private:
+	void StartReposition();
+	void NextRepostion(CK3dEntity* obj);
+	void EndRepostition();
+
 	void StartFile(FILE** fs, char* suffix);
 	void NextFile(FILE** fs, char* name, char* suffix);
 	void EndFile(FILE** fs);
@@ -65,6 +69,8 @@ class obj_export {
 
 	FILE* fObj;
 	FILE* fMtl;
+	FILE* frepos_3dsmax;
+	FILE* frepos_blender;
 	char* path_help;
 	char* name_help;
 	std::set<CK_ID>* matList;

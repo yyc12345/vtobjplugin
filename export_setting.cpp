@@ -79,6 +79,8 @@ BEGIN_MESSAGE_MAP(ExportSetting, CDialogEx)
 	ON_BN_CLICKED(IDC_CHECK3, &ExportSetting::func_RefreshUI)
 	ON_BN_CLICKED(IDC_CHECK6, &ExportSetting::func_RefreshUI)
 	ON_BN_CLICKED(IDC_CHECK5, &ExportSetting::func_RefreshUI)
+	ON_BN_CLICKED(IDC_CHECK2, &ExportSetting::func_RefreshUI)
+	ON_BN_CLICKED(IDC_CHECK4, &ExportSetting::func_RefreshUI)
 END_MESSAGE_MAP()
 
 
@@ -249,6 +251,7 @@ void ExportSetting::func_ChangeExportMode() {
 }
 
 void ExportSetting::func_RefreshUI() {
+	//material field
 	if (m_ExportMtl.GetCheck()) m_ExportTexture.EnableWindow(TRUE);
 	else m_ExportTexture.EnableWindow(FALSE);
 
@@ -263,6 +266,14 @@ void ExportSetting::func_RefreshUI() {
 	if (m_CustomTextureFormat.GetCheck() && m_CustomTextureFormat.IsWindowEnabled()) m_TextureFormat.EnableWindow(TRUE);
 	else m_TextureFormat.EnableWindow(FALSE);
 
+	//repostion field
+	if (m_OmitTransform.GetCheck() && m_RightHand.GetCheck()) {
+		m_Reposition_3dsmax.EnableWindow(TRUE);
+		m_Reposition_Blender.EnableWindow(TRUE);
+	} else {
+		m_Reposition_3dsmax.EnableWindow(FALSE);
+		m_Reposition_Blender.EnableWindow(FALSE);
+	}
 }
 
 void ExportSetting::LoadConfig() {
@@ -279,9 +290,9 @@ void ExportSetting::LoadConfig() {
 		res_settings->reposition_blender = FALSE;
 		res_settings->export_mtl = TRUE;
 		res_settings->export_texture = TRUE;
-		res_settings->copy_texture = TRUE;
-		res_settings->custom_texture_format = FALSE;
-		res_settings->texture_format[0] = '\0';
+		res_settings->copy_texture = FALSE;
+		res_settings->custom_texture_format = TRUE;
+		strcpy(res_settings->texture_format, "bmp");
 
 		SaveConfig();
 		return;
