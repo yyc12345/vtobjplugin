@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "vt_menu.h"
+#include "obj_export.h"
 
 PluginInterface* s_Plugininterface = NULL;
 PluginInfo g_PluginInfo0;
+obj_export* exporter = NULL;
 
 int GetVirtoolsPluginInfoCount() {
 	return 1;
@@ -32,11 +34,15 @@ BOOL SuperScriptMaterializer::InitInstance() {
 	g_PluginInfo0.m_PluginType = (PluginInfo::PLUGIN_TYPE)(g_PluginInfo0.m_PluginType | PluginInfo::PTF_RECEIVENOTIFICATION);
 	g_PluginInfo0.m_PluginCallback = PluginCallback;
 
+	exporter = new obj_export();
+
 	return CWinApp::InitInstance();
 }
 
 int SuperScriptMaterializer::ExitInstance() {
 	// TODO: Add your specialized code here and/or call the base class
+
+	delete exporter;
 
 	return CWinApp::ExitInstance();
 }

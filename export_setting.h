@@ -25,23 +25,38 @@ class ExportSetting : public CDialogEx {
 	DECLARE_MESSAGE_MAP()
 
 	public:
-	CEdit m_ExportFolder;
-	CButton m_OmitTransform;
-	CButton m_ExportMtl;
-	CButton m_ExportTexture;
-	CEdit m_TextureFormat;
+	//=============general setting
 	CButton m_ExportMode_Object;
 	CButton m_ExportMode_Group;
-	CButton m_ExportMode_All;	
+	CButton m_ExportMode_All;
 	CComboBox m_ExportList;
+
+	CButton m_FileMode_All;
+	CButton m_FileMode_Single;
+
+	CEdit m_ExportFolder;
+
+	//=============object setting
+	CButton m_OmitTransform;
 	CButton m_RightHand;
+
+	//=============reposition setting
+	CButton m_Reposition_3dsmax;
+	CButton m_Reposition_Blender;
+
+	//=============material setting
+	CButton m_ExportMtl;
+	CButton m_ExportTexture;
+	CButton m_CopyTexture;
 	CButton m_CustomTextureFormat;
-	CButton m_SaveAlpha;
+	CEdit m_TextureFormat;
+
 	virtual BOOL OnInitDialog();
 	afx_msg void func_ExportFolderBroswer();
 	afx_msg void func_DialogOK();
 	afx_msg void func_DialogCancel();
-	afx_msg void func_ChangeExportMode(UINT nID);
+	afx_msg void func_ChangeExportMode();
+	afx_msg void func_RefreshUI();
 
 	ExportConfig* res_settings;
 
@@ -49,8 +64,10 @@ class ExportSetting : public CDialogEx {
 	CKContext* context;
 	std::vector<CK_ID> comboboxMirror;
 	int cache_ExportMode;
+	char* current_folder;
 
+	void SaveConfig();
+	void LoadConfig();
+	
 };
-
-
 #endif

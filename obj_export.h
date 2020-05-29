@@ -10,29 +10,66 @@ enum ExportMode {
 	EXPORTMODE_ALL
 };
 
+enum FileMode {
+	FILEMODE_ONEFILE,	//all object in one file
+	FILEMODE_MULTIFILE	//one file per object
+};
+
 typedef struct {
-	char export_folder[1024];
-	BOOL omit_transform;
-	BOOL export_mtl;
-	BOOL export_texture;
-	BOOL right_hand;
-	BOOL custom_texture_format;
-	BOOL save_alpha;
-	char texture_format[32];
 	ExportMode export_mode;
 	CK_ID selected_item;
+	FileMode file_mode;
+	char export_folder[65526];
+
+	BOOL omit_transform;
+	BOOL right_hand;
+
+	BOOL reposition_3dsmax;
+	BOOL reposition_blender;
+
+	BOOL export_mtl;
+	BOOL export_texture;
+	BOOL copy_texture;
+	BOOL custom_texture_format;
+	char texture_format[32];
+
 }ExportConfig;
 
-void ExportAllWarpper(CKContext* ctx, ExportConfig* cfg);
-void ExportGroupWarpper(CKContext* ctx, ExportConfig* cfg);
-void ExportObjectWarpper(CKContext* ctx, ExportConfig* cfg);
-void ExportObject(FILE* fs, CK3dEntity* obj, ExportConfig* cfg, std::set<CK_ID>* matList, int* storedV, char* nameingHlp);
-void ExportMaterial(FILE* fs, ExportConfig* cfg, CKMaterial* mtl, char* nameingHlp);
+class obj_export {
+	public:
+	obj_export();
+	~obj_export();
 
-void GenerateObjName(CK3dEntity* obj, char* name);
-void GenerateMtlName(CKMaterial* obj, char* name);
-void GenerateTextureName(CKTexture* obj, char* name);
-void NameUniform(char* str);
-void strinsert(char* str, const char* insertedStr);
+	void Ready4Export(CKContext* ctx, ExportConfig* cfg);
+	void ExportAllWarpper();
+	void ExportGroupWarpper();
+	void ExportObjectWarpper();
+
+	private:
+	void StartFile(FILE** fs, char* suffix);
+	void NextFile(FILE** fs, char* name, char* suffix);
+	void EndFile(FILE** fs);
+
+	void ExportObject(CK3dEntity* obj, int* storedV);
+	void ExportMaterial();
+	void ExportMaterial(CKMaterial* mtl);
+
+	void GenerateObjName(CK3dEntity* obj, char* name);
+	void GenerateMtlName(CKMaterial* obj, char* name);
+	void GenerateFileName(CKObject* obj, char* name);
+	void GenerateTextureName(CKTexture* obj, char* name, char* suffix);
+	void ObjectNameUniform(char* str);
+	void FileNameUniform(char* str);
+	void strinsert(char* str, const char* insertedStr);
+
+
+	FILE* fObj;
+	FILE* fMtl;
+	char* path_help;
+	char* name_help;
+	std::set<CK_ID>* matList;
+	ExportConfig* cfg;
+	CKContext* ctx;
+};
 
 #endif

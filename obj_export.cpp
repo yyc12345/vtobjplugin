@@ -1,55 +1,157 @@
 #include "obj_export.h"
+#include <exception>
 #pragma warning(disable:6387)
 
-void ExportAllWarpper(CKContext* ctx, ExportConfig* cfg) {
-
+obj_export::obj_export() {
+	fObj = NULL;
+	fMtl = NULL;
+	cfg = NULL;
+	ctx = NULL;
+	matList = new std::set<CK_ID>();
+	path_help = (char*)calloc(65526, sizeof(char));
+	name_help = (char*)calloc(255, sizeof(char));
+	if (path_help == NULL || name_help == NULL)
+		throw std::bad_alloc();
 }
-void ExportGroupWarpper(CKContext* ctx, ExportConfig* cfg) {
-
-}
-void ExportObjectWarpper(CKContext* ctx, ExportConfig* cfg) {
-	auto matList = new std::set<CK_ID>();
-	char* filename = (char*)calloc(1024, sizeof(char));
-	assert(filename != NULL);
-
-	//obj
-	strcpy(filename, cfg->export_folder);
-	strcat(filename, "\\all.obj");
-	FILE* fso = fopen(filename, "w");
-	assert(fso != NULL);
-	if (cfg->export_mtl)
-		fputs("mtllib all.mtl\n", fso);
-	int storedV = 0;
-	ExportObject(fso, (CK3dEntity*)ctx->GetObjectA(cfg->selected_item), cfg, matList, &storedV, filename);
-	fclose(fso);
-
-	//mtl
-	if (cfg->export_mtl) {
-		strcpy(filename, cfg->export_folder);
-		strcat(filename, "\\all.mtl");
-		FILE* fsm = fopen(filename, "w");
-		assert(fsm != NULL);
-
-		CKMaterial* mtl = NULL;
-		for (auto it = matList->begin(); it != matList->end(); it++) {
-			mtl = (CKMaterial*)ctx->GetObjectA(*it);
-			ExportMaterial(fsm, cfg, mtl, filename);
-		}
-		fclose(fsm);
-	}
-
-	free(filename);
+obj_export::~obj_export() {
+	free(path_help);
+	free(name_help);
 	delete matList;
 }
 
+void obj_export::Ready4Export(CKContext* ctx, ExportConfig* cfg) {
+	this->ctx = ctx; 
+	this->cfg = cfg; 
+	matList->clear();
+}
+void obj_export::ExportAllWarpper() {
+	XObjectPointerArray objArray = ctx->GetObjectListByType(CKCID_3DENTITY, TRUE);
+	int count = objArray.Size();
 
-void ExportObject(FILE* fs, CK3dEntity* obj, ExportConfig* cfg, std::set<CK_ID>* matList, int* storedV, char* nameingHlp) {
+	CK3dEntity* obj = NULL;
+	int storedV = 0;
+	StartFile(&fObj, "obj");
+	StartFile(&fMtl, "mtl");
+
+	for (int i = 0; i < count; i++) {
+		obj = (CK3dEntity*)objArray[i];
+		NextFile(&fObj, obj->GetName(), "obj");
+		ExportObject(obj, &storedV);
+
+		// if multifile, export here for each object
+		if (cfg->file_mode == FILEMODE_MULTIFILE) {
+			storedV = 0;
+			NextFile(&fMtl, obj->GetName(), "mtl");
+			ExportMaterial();
+		}
+	}
+
+	//if one file, export mtl here to make sure some material can be shared using
+	ExportMaterial();
+
+	EndFile(&fObj);
+	EndFile(&fMtl);
+}
+void obj_export::ExportGroupWarpper() {
+	XObjectPointerArray objArray = ctx->GetObjectListByType(CKCID_3DENTITY, TRUE);
+	int count = objArray.Size();
+
+	CK3dEntity* obj = NULL;
+	CKGroup* grp = (CKGroup*)ctx->GetObjectA(cfg->selected_item);
+	int storedV = 0;
+	StartFile(&fObj, "obj");
+	StartFile(&fMtl, "mtl");
+
+	for (int i = 0; i < count; i++) {
+		obj = (CK3dEntity*)objArray[i];
+		if (!obj->IsInGroup(grp)) continue;
+
+		NextFile(&fObj, obj->GetName(), "obj");
+		ExportObject(obj, &storedV);
+
+		// if multifile, export here for each object
+		if (cfg->file_mode == FILEMODE_MULTIFILE) {
+			storedV = 0;
+			NextFile(&fMtl, obj->GetName(), "mtl");
+			ExportMaterial();
+		}
+	}
+
+	//if one file, export mtl here to make sure some material can be shared using
+	ExportMaterial();
+
+	EndFile(&fObj);
+	EndFile(&fMtl);
+}
+void obj_export::ExportObjectWarpper() {
+	//obj mtl
+	StartFile(&fObj, "obj");
+	StartFile(&fMtl, "mtl");
+
+	int storedV = 0;
+	CK3dEntity* obj = (CK3dEntity*)ctx->GetObjectA(cfg->selected_item);
+	NextFile(&fObj, obj->GetName(), "obj");
+	ExportObject(obj, &storedV);
+	if (cfg->export_mtl) {
+		NextFile(&fMtl, obj->GetName(), "mtl");
+		ExportMaterial();
+	}
+
+	EndFile(&fObj);
+	EndFile(&fMtl);
+
+}
+
+void obj_export::StartFile(FILE** fs, char* suffix) {
+	if (cfg->file_mode == FILEMODE_ONEFILE) {
+		if (*fs == NULL) {
+			sprintf(path_help, "%s\\all.%s", cfg->export_folder, suffix);
+			*fs = fopen(path_help, "w");
+			if (*fs == NULL) throw std::bad_alloc();
+		}
+	}
+}
+void obj_export::NextFile(FILE** fs, char* name, char* suffix) {
+	if (cfg->file_mode == FILEMODE_MULTIFILE) {
+		//close file
+		if (*fs != NULL) fclose(*fs);
+
+		//open new file
+		strcpy(name_help, name);
+		FileNameUniform(name_help);
+		sprintf(path_help, "%s\\%s.%s", cfg->export_folder, name_help, suffix);
+		*fs = fopen(path_help, "w");
+		if (*fs == NULL) throw std::bad_alloc();
+	}
+}
+void obj_export::EndFile(FILE** fs) {
+	if (fs != NULL) {
+		fclose(*fs);
+		*fs = NULL;
+	}
+		
+	
+}
+
+
+void obj_export::ExportObject(CK3dEntity* obj, int* storedV) {
+	//========================set up stored v and const
 	int voffset = *storedV;
 	CKMesh* mesh = obj->GetCurrentMesh();
 	int count = mesh->GetVertexCount();
 	(*storedV) += count;
-
 	float global_reverse = cfg->right_hand ? -1.0f : 1.0f;
+
+	//mtllib
+	if (voffset == 0) {
+		//the first obj, add mtllib
+		if (cfg->file_mode == FILEMODE_MULTIFILE) {
+			strcpy(name_help, obj->GetName());
+			FileNameUniform(name_help);
+		} else strcpy(name_help, "all");
+		if (cfg->export_mtl)
+			fprintf(fObj, "mtllib %s.mtl\n", name_help);
+	}
 
 	//v
 	VxVector cacheVec1, cacheVec2;
@@ -57,10 +159,10 @@ void ExportObject(FILE* fs, CK3dEntity* obj, ExportConfig* cfg, std::set<CK_ID>*
 	for (int i = 0; i < count; i++) {
 		mesh->GetVertexPosition(i, &cacheVec1);
 		if (cfg->omit_transform) {
-			fprintf(fs, "v %f %f %f\n", cacheVec1.x, cacheVec1.y, cacheVec1.z * global_reverse);
+			fprintf(fObj, "v %f %f %f\n", cacheVec1.x, cacheVec1.y, cacheVec1.z * global_reverse);
 		} else {
 			Vx3DMultiplyMatrixVector(&cacheVec2, cacheMat, &cacheVec1);
-			fprintf(fs, "v %f %f %f\n", cacheVec2.x, cacheVec2.y, cacheVec2.z * global_reverse);
+			fprintf(fObj, "v %f %f %f\n", cacheVec2.x, cacheVec2.y, cacheVec2.z * global_reverse);
 		}
 	}
 
@@ -68,18 +170,18 @@ void ExportObject(FILE* fs, CK3dEntity* obj, ExportConfig* cfg, std::set<CK_ID>*
 	float u, v;
 	for (int i = 0; i < count; i++) {
 		mesh->GetVertexTextureCoordinates(i, &u, &v);
-		fprintf(fs, "vt %f %f 0\n", u, v * global_reverse);
+		fprintf(fObj, "vt %f %f 0\n", u, v * global_reverse);
 	}
 
 	//vn
 	for (int i = 0; i < count; i++) {
 		mesh->GetVertexNormal(i, &cacheVec1);
-		fprintf(fs, "vn %f %f %f\n", cacheVec1.x, cacheVec1.y, cacheVec1.z * global_reverse);
+		fprintf(fObj, "vn %f %f %f\n", cacheVec1.x, cacheVec1.y, cacheVec1.z * global_reverse);
 	}
 
 	//g
-	GenerateObjName(obj, nameingHlp);
-	fprintf(fs, "g %s\n", nameingHlp);
+	GenerateObjName(obj, name_help);
+	fprintf(fObj, "g %s\n", name_help);
 
 	//f and usemtl
 	count = mesh->GetFaceCount();
@@ -91,74 +193,103 @@ void ExportObject(FILE* fs, CK3dEntity* obj, ExportConfig* cfg, std::set<CK_ID>*
 			CKMaterial* fmtl = mesh->GetFaceMaterial(i);
 			if (fmtl != NULL) {
 				matList->insert(fmtl->GetID());
-				GenerateMtlName(fmtl, nameingHlp);
-				fprintf(fs, "usemtl %s\n", nameingHlp);
-			} else fputs("usemtl off\n", fs);
+				GenerateMtlName(fmtl, name_help);
+				fprintf(fObj, "usemtl %s\n", name_help);
+			} else fputs("usemtl off\n", fObj);
 		}
 
 		//f
 		i1 = (int)fIndices[i * 3] + 1 + voffset;
 		i2 = (int)fIndices[i * 3 + 1] + 1 + voffset;
 		i3 = (int)fIndices[i * 3 + 2] + 1 + voffset;
-		fprintf(fs, "f %d/%d/%d %d/%d/%d %d/%d/%d\n",
+		fprintf(fObj, "f %d/%d/%d %d/%d/%d %d/%d/%d\n",
 			i3, i3, i3,
 			i2, i2, i2,
 			i1, i1, i1);
 	}
 
 }
-void ExportMaterial(FILE* fs, ExportConfig* cfg, CKMaterial* mtl, char* nameingHlp) {
-	//basic
-	GenerateMtlName(mtl, nameingHlp);
-	fprintf(fs, "newmtl %s\n", nameingHlp);
-	VxColor col = mtl->GetAmbient();
-	fprintf(fs, "Ka %f %f %f\n", col.r, col.g, col.b);
-	col = mtl->GetDiffuse();
-	fprintf(fs, "Kd %f %f %f\n", col.r, col.g, col.b);
-	col = mtl->GetEmissive();
-	fprintf(fs, "Ks %f %f %f\n", col.r, col.g, col.b);
+void obj_export::ExportMaterial() {
+	//save mtl
+	CKMaterial* mtl = NULL;
+	for (auto it = matList->begin(); it != matList->end(); it++) {
+		mtl = (CKMaterial*)ctx->GetObjectA(*it);
+		ExportMaterial(mtl);
+	}
 
-	//texture
+	matList->clear();
+}
+void obj_export::ExportMaterial(CKMaterial* mtl) {
+	//basic
+	GenerateMtlName(mtl, name_help);
+	fprintf(fMtl, "newmtl %s\n", name_help);
+	VxColor col = mtl->GetAmbient();
+	fprintf(fMtl, "Ka %f %f %f\n", col.r, col.g, col.b);
+	col = mtl->GetDiffuse();
+	fprintf(fMtl, "Kd %f %f %f\n", col.r, col.g, col.b);
+	col = mtl->GetEmissive();
+	fprintf(fMtl, "Ks %f %f %f\n", col.r, col.g, col.b);
+
+	//set up texture
+	if (!cfg->export_texture) return;
 	CKTexture* texture = mtl->GetTexture();
 	if (texture == NULL) return;
-	GenerateTextureName(texture, nameingHlp);
-	if (cfg->custom_texture_format) {
-		strcat(nameingHlp, ".");
-		strcat(nameingHlp, cfg->texture_format);
-	}
-	fprintf(fs, "map_Kd %s\n", nameingHlp);
+
+	if (cfg->custom_texture_format) GenerateTextureName(texture, name_help, cfg->texture_format);
+	else GenerateTextureName(texture, name_help, NULL);
+
+	fprintf(fMtl, "map_Kd %s\n", name_help);
 
 	//export texture
-	if (!cfg->export_texture) return;
-	strinsert(nameingHlp, "\\");
-	strinsert(nameingHlp, cfg->export_folder);
+	if (!cfg->copy_texture) return;
+	sprintf(path_help, "%s\\%s", cfg->export_folder, name_help);
 	//if (cfg->save_alpha) texture->SaveImageAlpha(nameingHlp, 0);
 	//else texture->SaveImage(nameingHlp, 0, !cfg->custom_texture_format);
-	texture->SaveImage(nameingHlp, 0, !cfg->custom_texture_format);
-	
+	texture->SaveImage(path_help, 0, FALSE);
+
 }
 
 
-void GenerateObjName(CK3dEntity* obj, char* name) {
+void obj_export::GenerateObjName(CK3dEntity* obj, char* name) {
 	sprintf(name, "obj%d_%s", obj->GetID(), obj->GetName());
-	NameUniform(name);
+	ObjectNameUniform(name);
 }
-void GenerateMtlName(CKMaterial* obj, char* name) {
+void obj_export::GenerateMtlName(CKMaterial* obj, char* name) {
 	sprintf(name, "mtl%d_%s", obj->GetID(), obj->GetName());
-	NameUniform(name);
+	ObjectNameUniform(name);
 }
-void GenerateTextureName(CKTexture* obj, char* name) {
-	sprintf(name, "%s", obj->GetName());
-	NameUniform(name);
+void obj_export::GenerateFileName(CKObject* obj, char* name) {
+	strcpy(name, obj->GetName());
+	FileNameUniform(name);
 }
-void NameUniform(char* str) {
+void obj_export::GenerateTextureName(CKTexture* obj, char* name, char* suffix) {
+	if (suffix == NULL) sprintf(name, "%s", obj->GetName());
+	else sprintf(name, "%s.%s", obj->GetName(), suffix);
+	ObjectNameUniform(name);
+}
+void obj_export::ObjectNameUniform(char* str) {
 	int len = strlen(str);
 	for (int i = 0; i < len; i++) {
 		if (str[i] == ' ')
 			str[i] = '_';
 	}
 }
-void strinsert(char* str, const char* insertedStr) {
+void obj_export::FileNameUniform(char* str) {
+	int len = strlen(str);
+	for (int i = 0; i < len; i++) {
+		if (str[i] == ' ' ||
+			str[i] == '\\' ||
+			str[i] == '/' ||
+			str[i] == '*' ||
+			str[i] == '?' ||
+			str[i] == '"' ||
+			str[i] == '<' ||
+			str[i] == '>' ||
+			str[i] == '|')
+			str[i] = '_';
+	}
+}
+void obj_export::strinsert(char* str, const char* insertedStr) {
 	int i = strlen(str), j = strlen(insertedStr);
 	for (int q = i + j; q >= 0; q--) {
 		if (q >= j) str[q] = str[q - j];

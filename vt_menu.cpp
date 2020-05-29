@@ -2,7 +2,9 @@
 #include "export_setting.h"
 
 extern PluginInterface* s_Plugininterface;
+extern obj_export* exporter;
 CMenu* s_MainMenu = NULL;
+
 
 void PluginCallback(PluginInfo::CALLBACK_REASON reason, PluginInterface* plugininterface) {
 	switch (reason) {
@@ -59,15 +61,16 @@ void PluginMenuCallback(int commandID) {
 		return;
 	}
 
+	exporter->Ready4Export(ctx, es->res_settings);
 	switch (es->res_settings->export_mode) {
 		case EXPORTMODE_ALL:
-			ExportAllWarpper(ctx, es->res_settings);
+			exporter->ExportAllWarpper();
 			break;
 		case EXPORTMODE_GROUP:
-			ExportGroupWarpper(ctx, es->res_settings);
+			exporter->ExportGroupWarpper();
 			break;
 		case EXPORTMODE_OBJECT:
-			ExportObjectWarpper(ctx, es->res_settings);
+			exporter->ExportObjectWarpper();
 			break;
 	}
 
