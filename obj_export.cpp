@@ -122,6 +122,11 @@ void obj_export::StartReposition() {
 		strcat(path_help, "\\3dsmax.ms");
 		frepos_3dsmax = fopen(path_help, "w");
 		if (frepos_3dsmax == NULL) throw std::bad_alloc();
+
+		//write header
+		fputs("fn tryModify obj mat = (\n", frepos_3dsmax);
+		fputs("    try obj.transform = mat catch ()\n", frepos_3dsmax);
+		fputs(")\n", frepos_3dsmax);
 	}
 	if (cfg->reposition_blender) {
 		strcpy(path_help, cfg->export_folder);
@@ -142,6 +147,14 @@ void obj_export::StartReposition() {
 void obj_export::NextRepostion(CK3dEntity* obj) {
 	if (frepos_3dsmax != NULL) {
 		//todo: finish 3ds max repostion export
+		VxMatrix cacheMat = obj->GetWorldMatrix();
+		GenerateObjName(obj, name_help);
+		fprintf(frepos_3dsmax, "tryModify $%s (matrix3 [%f, %f, %f] [%f, %f, %f] [%f, %f, %f] [%f, %f, %f])\n",
+			name_help,
+			cacheMat[0][0], cacheMat[0][2], cacheMat[0][1],
+			cacheMat[2][0], cacheMat[2][2], cacheMat[2][1],
+			cacheMat[1][0], cacheMat[1][2], cacheMat[1][1],
+			cacheMat[3][0], cacheMat[3][2], cacheMat[3][1]);
 	}
 	if (frepos_blender != NULL) {
 		VxMatrix cacheMat = obj->GetWorldMatrix();
@@ -330,36 +343,39 @@ void obj_export::GenerateMtlName(CKMaterial* obj, char* name) {
 	sprintf(name, "mtl%d_%s", obj->GetID(), obj->GetName());
 	ObjectNameUniform(name);
 }
-void obj_export::GenerateFileName(CKObject* obj, char* name) {
+void obj_export::GenerateTextureName(CKTexture* obj, char* name, char* suffix) {
 	strcpy(name, obj->GetName());
 	FileNameUniform(name);
-}
-void obj_export::GenerateTextureName(CKTexture* obj, char* name, char* suffix) {
-	if (suffix == NULL) sprintf(name, "%s", obj->GetName());
-	else sprintf(name, "%s.%s", obj->GetName(), suffix);
-	ObjectNameUniform(name);
+	if (suffix != NULL) {
+		strcat(name, ".");
+		strcat(name, suffix);
+	}
 }
 void obj_export::ObjectNameUniform(char* str) {
 	int len = strlen(str);
 	for (int i = 0; i < len; i++) {
-		if (str[i] == ' ' ||
-			str[i] == '\'' ||
-			str[i] == '"')
+		if (str[i] == ' ' || //obj ban
+			str[i] == '\'' || //blender ban
+			str[i] == '$' || //3dsmax ban
+			str[i] == '.' ||
+			str[i] == '"') //my own ban
 			str[i] = '_';
 	}
 }
 void obj_export::FileNameUniform(char* str) {
 	int len = strlen(str);
 	for (int i = 0; i < len; i++) {
-		if (str[i] == ' ' ||
-			str[i] == '\\' ||
+		if (str[i] == ' ' || //sync with object uniform
+			str[i] == '\'' ||
+			str[i] == '$' ||
+			str[i] == '.' ||
+			str[i] == '\\' || //file system ban
 			str[i] == '/' ||
 			str[i] == '*' ||
 			str[i] == '?' ||
 			str[i] == '"' ||
 			str[i] == '<' ||
 			str[i] == '>' ||
-			str[i] == '\'' ||
 			str[i] == '|')
 			str[i] = '_';
 	}
