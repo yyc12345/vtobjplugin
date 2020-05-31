@@ -58,13 +58,12 @@ class obj_export {
 	void ExportMaterial();
 	void ExportMaterial(CKMaterial* mtl);
 
+	BOOL JudgeValidObject(CK3dEntity* obj);
 	void GenerateObjName(CK3dEntity* obj, char* name);
 	void GenerateMtlName(CKMaterial* obj, char* name);
-	void GenerateFileName(CKObject* obj, char* name);
 	void GenerateTextureName(CKTexture* obj, char* name, char* suffix);
 	void ObjectNameUniform(char* str);
 	void FileNameUniform(char* str);
-	void strinsert(char* str, const char* insertedStr);
 
 
 	FILE* fObj;

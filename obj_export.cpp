@@ -38,6 +38,8 @@ void obj_export::ExportAllWarpper() {
 
 	for (int i = 0; i < count; i++) {
 		obj = (CK3dEntity*)objArray[i];
+		if (!JudgeValidObject(obj)) continue;	//judge whether it is a valid export object
+
 		NextFile(&fObj, obj->GetName(), "obj");
 		ExportObject(obj, &storedV);
 		NextRepostion(obj);
@@ -72,6 +74,7 @@ void obj_export::ExportGroupWarpper() {
 		obj = (CK3dEntity*)objArray[i];
 		if (!obj->IsInGroup(grp)) continue;
 
+		if (!JudgeValidObject(obj)) continue;	//judge whether it is a valid export object
 		NextFile(&fObj, obj->GetName(), "obj");
 		ExportObject(obj, &storedV);
 		NextRepostion(obj);
@@ -92,13 +95,15 @@ void obj_export::ExportGroupWarpper() {
 	EndFile(&fMtl);
 }
 void obj_export::ExportObjectWarpper() {
+	int storedV = 0;
+	CK3dEntity* obj = (CK3dEntity*)ctx->GetObjectA(cfg->selected_item);
+	if (!JudgeValidObject(obj)) return;	//judge whether it is a valid export object
+
 	//obj mtl
 	StartFile(&fObj, "obj");
 	StartFile(&fMtl, "mtl");
 	StartReposition();
 
-	int storedV = 0;
-	CK3dEntity* obj = (CK3dEntity*)ctx->GetObjectA(cfg->selected_item);
 	NextFile(&fObj, obj->GetName(), "obj");
 	ExportObject(obj, &storedV);
 	NextRepostion(obj);
@@ -262,7 +267,12 @@ void obj_export::ExportObject(CK3dEntity* obj, int* storedV) {
 
 	//f and usemtl
 	count = mesh->GetFaceCount();
+#if defined(TARGET_VT35)
 	WORD* fIndices = mesh->GetFacesIndices();
+#endif
+#if defined(TARGET_VT5)
+	CKVINDEX* fIndices = mesh->GetFacesIndices();
+#endif
 	int i1, i2, i3;
 	for (int i = 0; i < count; i++) {
 		//usemtl
@@ -335,6 +345,12 @@ void obj_export::ExportMaterial(CKMaterial* mtl) {
 }
 
 
+BOOL obj_export::JudgeValidObject(CK3dEntity* obj) {
+	CKMesh* mesh = obj->GetCurrentMesh();
+	if (mesh == NULL) return FALSE;					//no mesh
+	if (mesh->GetFaceCount() == 0) return FALSE;	//mo face
+	return TRUE;
+}
 void obj_export::GenerateObjName(CK3dEntity* obj, char* name) {
 	sprintf(name, "obj%d_%s", obj->GetID(), obj->GetName());
 	ObjectNameUniform(name);
@@ -378,12 +394,5 @@ void obj_export::FileNameUniform(char* str) {
 			str[i] == '>' ||
 			str[i] == '|')
 			str[i] = '_';
-	}
-}
-void obj_export::strinsert(char* str, const char* insertedStr) {
-	int i = strlen(str), j = strlen(insertedStr);
-	for (int q = i + j; q >= 0; q--) {
-		if (q >= j) str[q] = str[q - j];
-		else str[q] = insertedStr[q];
 	}
 }
