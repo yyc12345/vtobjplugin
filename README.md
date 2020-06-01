@@ -1,5 +1,7 @@
 # vtobjplugin
 
+[中文文档](README_ZH.md)
+
 Virtools Obj Plugin.
 
 A interface plugin of Virtools which allows you to export some models as `.obj` file.
