@@ -33,7 +33,7 @@ void obj_export::ExportAllWarpper() {
 	CK3dEntity* obj = NULL;
 	int storedV = 0;
 	StartFile(&fObj, "obj");
-	StartFile(&fMtl, "mtl");
+	if (cfg->export_mtl) StartFile(&fMtl, "mtl");
 	StartReposition();
 
 	for (int i = 0; i < count; i++) {
@@ -47,17 +47,19 @@ void obj_export::ExportAllWarpper() {
 		// if multifile, export here for each object
 		if (cfg->file_mode == FILEMODE_MULTIFILE) {
 			storedV = 0;
-			NextFile(&fMtl, obj->GetName(), "mtl");
-			ExportMaterial();
+			if (cfg->export_mtl) {
+				NextFile(&fMtl, obj->GetName(), "mtl");
+				ExportMaterial();
+			}
 		}
 	}
 
 	//if one file, export mtl here to make sure some material can be shared using
-	ExportMaterial();
+	if (cfg->export_mtl) ExportMaterial();
 
 	EndRepostition();
 	EndFile(&fObj);
-	EndFile(&fMtl);
+	if (cfg->export_mtl) EndFile(&fMtl);
 }
 void obj_export::ExportGroupWarpper() {
 	XObjectPointerArray objArray = ctx->GetObjectListByType(CKCID_3DENTITY, TRUE);
@@ -67,7 +69,7 @@ void obj_export::ExportGroupWarpper() {
 	CKGroup* grp = (CKGroup*)ctx->GetObjectA(cfg->selected_item);
 	int storedV = 0;
 	StartFile(&fObj, "obj");
-	StartFile(&fMtl, "mtl");
+	if (cfg->export_mtl) StartFile(&fMtl, "mtl");
 	StartReposition();
 
 	for (int i = 0; i < count; i++) {
@@ -82,17 +84,19 @@ void obj_export::ExportGroupWarpper() {
 		// if multifile, export here for each object
 		if (cfg->file_mode == FILEMODE_MULTIFILE) {
 			storedV = 0;
-			NextFile(&fMtl, obj->GetName(), "mtl");
-			ExportMaterial();
+			if (cfg->export_mtl) {
+				NextFile(&fMtl, obj->GetName(), "mtl");
+				ExportMaterial();
+			}
 		}
 	}
 
 	//if one file, export mtl here to make sure some material can be shared using
-	ExportMaterial();
+	if (cfg->export_mtl) ExportMaterial();
 
 	EndRepostition();
 	EndFile(&fObj);
-	EndFile(&fMtl);
+	if (cfg->export_mtl) EndFile(&fMtl);
 }
 void obj_export::ExportObjectWarpper() {
 	int storedV = 0;
@@ -101,7 +105,7 @@ void obj_export::ExportObjectWarpper() {
 
 	//obj mtl
 	StartFile(&fObj, "obj");
-	StartFile(&fMtl, "mtl");
+	if (cfg->export_mtl) StartFile(&fMtl, "mtl");
 	StartReposition();
 
 	NextFile(&fObj, obj->GetName(), "obj");
@@ -114,7 +118,7 @@ void obj_export::ExportObjectWarpper() {
 
 	EndRepostition();
 	EndFile(&fObj);
-	EndFile(&fMtl);
+	if (cfg->export_mtl) EndFile(&fMtl);
 
 }
 

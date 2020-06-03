@@ -43,38 +43,48 @@ void RemoveMenu() {
 }
 
 void UpdateMenu() {
-	s_Plugininterface->ClearPluginMenu(s_MainMenu);		//clear menu
+	s_Plugininterface->ClearPluginMenu(s_MainMenu);
 
 	s_Plugininterface->AddPluginMenuItem(s_MainMenu, 0, "Export object");
+	s_Plugininterface->AddPluginMenuItem(s_MainMenu, -1, NULL, TRUE);
+	s_Plugininterface->AddPluginMenuItem(s_MainMenu, 1, "Report bug");
+	s_Plugininterface->AddPluginMenuItem(s_MainMenu, 2, "About vtobjplugin");
 
-	s_Plugininterface->UpdatePluginMenu(s_MainMenu);	//update menu,always needed when you finished to update the menu
-														//unless you want the menu not to have Virtools Dev main menu color scheme.
+
+	s_Plugininterface->UpdatePluginMenu(s_MainMenu);
 }
 
 void PluginMenuCallback(int commandID) {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	CKContext* ctx = s_Plugininterface->GetCKContext();
 
-	ExportSetting* es = new ExportSetting(ctx);
-	if (es->DoModal() != IDOK) {
+	if (commandID == 0) {
+		CKContext* ctx = s_Plugininterface->GetCKContext();
+
+		ExportSetting* es = new ExportSetting(ctx);
+		if (es->DoModal() != IDOK) {
+			delete es;
+			return;
+		}
+
+		exporter->Ready4Export(ctx, es->res_settings);
+		switch (es->res_settings->export_mode) {
+			case EXPORTMODE_ALL:
+				exporter->ExportAllWarpper();
+				break;
+			case EXPORTMODE_GROUP:
+				exporter->ExportGroupWarpper();
+				break;
+			case EXPORTMODE_OBJECT:
+				exporter->ExportObjectWarpper();
+				break;
+		}
+
+		ctx->OutputToConsole("[vtobjplugin] Export OK!");
 		delete es;
-		return;
-	}
-
-	exporter->Ready4Export(ctx, es->res_settings);
-	switch (es->res_settings->export_mode) {
-		case EXPORTMODE_ALL:
-			exporter->ExportAllWarpper();
-			break;
-		case EXPORTMODE_GROUP:
-			exporter->ExportGroupWarpper();
-			break;
-		case EXPORTMODE_OBJECT:
-			exporter->ExportObjectWarpper();
-			break;
-	}
-
-	ctx->OutputToConsole("[vtobjplugin] Export OK!");
-	delete es;
+	} else if (commandID == 1)
+		ShellExecute(NULL, "open", "https://github.com/yyc12345/vtobjplugin/issues", NULL, NULL, SW_SHOWNORMAL);
+	else if (commandID == 2)
+		AfxMessageBox("vtobjplugin - An OBJ export plugin for Virtools.\nUnder GPL v3 License.\nProject homepage: https://github.com/yyc12345/vtobjplugin", MB_ICONINFORMATION + MB_OK);
+	else;
 
 }

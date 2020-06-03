@@ -30,7 +30,7 @@ Virtools Obj 插件
 
 ## 操作方法
 
-1. 将插件安装到Virtools的InterfacePlugins文件夹中。
+1. 将插件安装到Virtools的`InterfacePlugins`文件夹中。
 1. 启动Virtools，加载需要导出的文档。
 1. 根据需要，考虑是否需要做额外操作，比如只想导出路面或者某些物体，需要把相关物体归到一个新组中，或者不做任何操作，例如导出单个物体或全部物体。
 1. 点击菜单栏Vtobj-Export object。
@@ -65,7 +65,7 @@ Virtools Obj 插件
 
 ## 导入提示
 
-此处就Blender和3ds Max导入做一些提示
+此处就Blender和3ds Max导入做一些提示。此处的设置是以对默认设置（即第一次使用此插件时的设置）为前提进行讲述的
 
 ### Blender
 
