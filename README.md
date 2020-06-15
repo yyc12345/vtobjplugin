@@ -22,11 +22,9 @@ Support Virtools 3.5 and 5.0
 ### Shortcomings
 
 * Right-hand left-hand coordinate system conversion only support swaping YZ axis.
-* For avoiding same name, all export objects will be attach a unique prefix.
 * Use group to split each object and don't provide any option for changing this.
 * No smooth group
 * Only export 3d object. Don't support 2 dimension structure such as Line and etc.
-* Couldn't detect original texture format and save it automatically
 
 ## Usage
 
@@ -35,6 +33,36 @@ Support Virtools 3.5 and 5.0
 1. According to your need, considering whether you need do some extra operations.
 1. Click menu`Vtobj`-`Export object`。
 1. Set all options in dialog and click OK to export objects.
+
+## Export config description
+
+### General Setting
+
+* Export mode: `An object`, `A group` and `All`. For `An object` and `A group`, you should pick a item in following Combobox.
+* File mode: `All objects in one file` and `One file per object`. For the first option, file will be named as `all`. For the second option, file name is object name. This option only affect obj and mtl files' count.
+* Export folder：It should be a existed folder. And you should pay attention to that the conflict file will be overwritten directly.
+
+### Object Setting
+
+* Omit object transform data: Suggest check. This option is only served for the compability with original `vt2obj`.
+* Convert to right-hand coordinate system: Convert to Blender and 3ds Max's coordinate system.
+* Add name prefix: Add a unique name prefix to avoid name conflict.
+
+### Reposition Script
+
+If you don't check `Omit object transform data` or `Convert to right-hand coordinate system`, this sector's options are disabled.
+
+Repostion means that restore object's original move, rotation and scale.
+
+* Generate 3ds Max script (3dsmax.ms)
+* Generate Blender script (blender.py)
+
+### Material Setting
+
+* Export mtl file: If you don't check it, the following options are disabled.
+* Export texture map in mtl: If you don't check it, all object's texture will be omitted and only keep light effect, such as reflect rate. And following options are disabled.
+* Copy texture file: Copy texture into your export folder. If you have existing texture folder, you can close this option to reduce the usage of storages and reduce useless IO operation.
+* Custom texture map format: If you check this and write a new suffix, all texture will be change to new format.
 
 ## Import tips
 
@@ -66,11 +94,4 @@ It is strongly not recommended that you compile by yourself unless you know Virt
 
 ## Develop plan
 
-The following functions will be added in the future:
-
-* Add option for cancel object and material name's prefix which originally is designd for avoiding naming problem.
-* Add more options for texture export.
-    * No suffix (Available now).
-    * Universal suffix (Available now).
-    * Specific suffix for each texture via configuration file.
-    * Auto detect file suffix via specificing external texture path.
+Current version is v1.3. There are no plan for futher development.

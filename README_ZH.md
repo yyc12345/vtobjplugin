@@ -22,11 +22,9 @@ Virtools Obj 插件
 ### 缺点
 
 * 左右手翻转只能支持YZ轴翻转。
-* 为了避免命名重复，物体名会被加上一个固定前缀。
 * 使用组来分割物体，并且不提供任何其他选项修改。
 * 平滑组没有考虑。
 * 只能导出3D物体，不能导出线等二维结构
-* 不能探测贴图原始格式并自动以原始格式保存。
 
 ## 操作方法
 
@@ -48,10 +46,11 @@ Virtools Obj 插件
 
 * Omit object transform data：忽略世界变换矩阵，建议勾选。此选项仅仅是为了提供向vt2obj兼容的功能而存在。
 * Convert to right-hand coordinate system：转为右手坐标系，特指Blender和3ds Max类型的右手坐标系。
+* Add name prefix：增加唯一的名称前缀以规避名称冲突。
 
 ### Reposition Script
 
-如果`Object Setting`中任意一项不勾选，那么下述两项将不可用。
+如果`Object Setting`中前两项中的任意一项不勾选，那么下述两项将不可用。
 
 * Generate 3ds Max script (3dsmax.ms)：生成3ds Max的重定位脚本
 * Generate Blender script (blender.py)：生成Blender的重定位脚本
@@ -93,11 +92,4 @@ Virtools Obj 插件
 
 ## 开发计划
 
-在未来，以下功能将被加入：
-
-* 添加选项使得可以取消物体和材质的防重名前缀
-* 对材质贴图导出增加更多选项
-    * 不修改（当前版本可用）
-    * 统一的后缀（当前版本可用）
-    * 通过配置文件手动指定各个贴图的后缀名
-    * 通过指定贴图路径自动探测贴图后缀名
+当前版本 v1.3，没有下一步的开发计划。
