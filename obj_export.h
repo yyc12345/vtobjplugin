@@ -2,6 +2,7 @@
 #define _YYCDLL_OBJ_EXPORT_H__IMPORTED_
 
 #include "stdafx.h"
+#include <string>
 #include <set>
 
 enum ExportMode {
@@ -19,10 +20,11 @@ typedef struct {
 	ExportMode export_mode;
 	CK_ID selected_item;
 	FileMode file_mode;
-	char export_folder[65526];
+	std::string export_folder;
 
 	BOOL omit_transform;
 	BOOL right_hand;
+	BOOL name_prefix;
 
 	BOOL reposition_3dsmax;
 	BOOL reposition_blender;
@@ -31,7 +33,7 @@ typedef struct {
 	BOOL export_texture;
 	BOOL copy_texture;
 	BOOL custom_texture_format;
-	char texture_format[32];
+	std::string texture_format;
 
 }ExportConfig;
 
@@ -61,17 +63,14 @@ class obj_export {
 	BOOL JudgeValidObject(CK3dEntity* obj);
 	void GenerateObjName(CK3dEntity* obj, char* name);
 	void GenerateMtlName(CKMaterial* obj, char* name);
-	void GenerateTextureName(CKTexture* obj, char* name, char* suffix);
+	void GenerateTextureName(CKTexture* obj, char* name, const char* suffix);
 	void ObjectNameUniform(char* str);
 	void FileNameUniform(char* str);
-
 
 	FILE* fObj;
 	FILE* fMtl;
 	FILE* frepos_3dsmax;
 	FILE* frepos_blender;
-	char* path_help;
-	char* name_help;
 	std::set<CK_ID>* matList;
 	ExportConfig* cfg;
 	CKContext* ctx;

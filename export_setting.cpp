@@ -1,5 +1,7 @@
 ﻿#include "stdafx.h"
 #include "export_setting.h"
+#include "buffer_helper.h"
+#include "config_manager.h"
 
 #pragma warning(disable:26812)
 
@@ -9,29 +11,15 @@ IMPLEMENT_DYNAMIC(ExportSetting, CDialogEx)
 
 ExportSetting::ExportSetting(CKContext* ctx, CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DIALOG1, pParent),
-	res_settings(NULL),
-	current_folder(NULL),
+	res_settings(),
 	context(ctx),
 	comboboxMirror(),
 	cache_ExportMode(-1) {
-
-	res_settings = new ExportConfig();
-
-	current_folder = (char*)calloc(65526, sizeof(char));
-	assert(current_folder != NULL);
-	GetModuleFileName(NULL, current_folder, 65526);
-	for (int i = strlen(current_folder); i >= 0; i--)
-		if (current_folder[i] == '\\') {
-			current_folder[i] = '\0';
-			break;
-		}
-	strcat(current_folder, "\\vtobjplugin.cfg");
-
+	;
 }
 
 ExportSetting::~ExportSetting() {
-	delete res_settings;
-	free(current_folder);
+	;
 }
 
 void ExportSetting::DoDataExchange(CDataExchange* pDX) {
@@ -51,6 +39,7 @@ void ExportSetting::DoDataExchange(CDataExchange* pDX) {
 	//=============object setting
 	DDX_Control(pDX, IDC_CHECK2, m_OmitTransform);
 	DDX_Control(pDX, IDC_CHECK4, m_RightHand);
+	DDX_Control(pDX, IDC_CHECK9, m_NamePrefix);
 
 	//=============reposition setting
 	DDX_Control(pDX, IDC_CHECK7, m_Reposition_3dsmax);
@@ -89,8 +78,8 @@ END_MESSAGE_MAP()
 BOOL ExportSetting::OnInitDialog() {
 	CDialogEx::OnInitDialog();
 
-	LoadConfig();
-	switch (res_settings->export_mode) {
+	config_manager::LoadConfig(&res_settings);
+	switch (res_settings.export_mode) {
 		case EXPORTMODE_OBJECT:
 			m_ExportMode_Object.SetCheck(1);
 			break;
@@ -101,7 +90,7 @@ BOOL ExportSetting::OnInitDialog() {
 			m_ExportMode_All.SetCheck(1);
 			break;
 	}
-	switch (res_settings->file_mode) {
+	switch (res_settings.file_mode) {
 		case FILEMODE_ONEFILE:
 			m_FileMode_All.SetCheck(1);
 			break;
@@ -109,19 +98,20 @@ BOOL ExportSetting::OnInitDialog() {
 			m_FileMode_Single.SetCheck(1);
 			break;
 	}
-	m_ExportFolder.SetWindowTextA(res_settings->export_folder);
+	m_ExportFolder.SetWindowTextA(res_settings.export_folder.c_str());
 
-	m_OmitTransform.SetCheck(res_settings->omit_transform);
-	m_RightHand.SetCheck(res_settings->right_hand);
+	m_OmitTransform.SetCheck(res_settings.omit_transform);
+	m_RightHand.SetCheck(res_settings.right_hand);
+	m_NamePrefix.SetCheck(res_settings.name_prefix);
 
-	m_Reposition_3dsmax.SetCheck(res_settings->reposition_3dsmax);
-	m_Reposition_Blender.SetCheck(res_settings->reposition_blender);
+	m_Reposition_3dsmax.SetCheck(res_settings.reposition_3dsmax);
+	m_Reposition_Blender.SetCheck(res_settings.reposition_blender);
 
-	m_ExportMtl.SetCheck(res_settings->export_mtl);
-	m_ExportTexture.SetCheck(res_settings->export_texture);
-	m_CopyTexture.SetCheck(res_settings->copy_texture);
-	m_CustomTextureFormat.SetCheck(res_settings->custom_texture_format);
-	m_TextureFormat.SetWindowTextA(res_settings->texture_format);
+	m_ExportMtl.SetCheck(res_settings.export_mtl);
+	m_ExportTexture.SetCheck(res_settings.export_texture);
+	m_CopyTexture.SetCheck(res_settings.copy_texture);
+	m_CustomTextureFormat.SetCheck(res_settings.custom_texture_format);
+	m_TextureFormat.SetWindowTextA(res_settings.texture_format.c_str());
 
 	this->func_RefreshUI();
 	this->func_ChangeExportMode();
@@ -136,65 +126,65 @@ BOOL ExportSetting::OnInitDialog() {
 #pragma region core func
 
 void ExportSetting::func_ExportFolderBroswer() {
-	char* buffer = (char*)calloc(65526, sizeof(char));
-	assert(buffer != NULL);
 	BROWSEINFOA folderViewer = { 0 };
 	folderViewer.hwndOwner = m_hWnd;
 	folderViewer.pidlRoot = NULL;
-	folderViewer.pszDisplayName = buffer;
+	folderViewer.pszDisplayName = buffer_helper::global_buffer;
 	folderViewer.lpszTitle = "Pick a folder";
 	folderViewer.lpfn = NULL;
 	folderViewer.ulFlags = BIF_RETURNONLYFSDIRS | BIF_USENEWUI;
 	PIDLIST_ABSOLUTE data = SHBrowseForFolder(&folderViewer);
 	if (data == NULL) return;
-	if (SHGetPathFromIDList(data, buffer))
-		m_ExportFolder.SetWindowTextA(buffer);
+	if (SHGetPathFromIDList(data, buffer_helper::global_buffer))
+		m_ExportFolder.SetWindowTextA(buffer_helper::global_buffer);
 	CoTaskMemFree(data);
-	free(buffer);
 }
 
 void ExportSetting::func_DialogOK() {
 
 	//general setting
-	res_settings->omit_transform = m_OmitTransform.GetCheck();
-	res_settings->right_hand = m_RightHand.GetCheck();
+	res_settings.omit_transform = m_OmitTransform.GetCheck();
+	res_settings.right_hand = m_RightHand.GetCheck();
+	res_settings.name_prefix = m_NamePrefix.GetCheck();
 
-	res_settings->reposition_3dsmax = m_Reposition_3dsmax.GetCheck();
-	res_settings->reposition_blender = m_Reposition_Blender.GetCheck();
+	res_settings.reposition_3dsmax = m_Reposition_3dsmax.GetCheck();
+	res_settings.reposition_blender = m_Reposition_Blender.GetCheck();
 
-	res_settings->export_mtl = m_ExportMtl.GetCheck();
-	res_settings->export_texture = m_ExportTexture.GetCheck();
-	res_settings->copy_texture = m_CopyTexture.GetCheck();
-	res_settings->custom_texture_format = m_CustomTextureFormat.GetCheck();
-	m_TextureFormat.GetWindowTextA(res_settings->texture_format, 32);
+	res_settings.export_mtl = m_ExportMtl.GetCheck();
+	res_settings.export_texture = m_ExportTexture.GetCheck();
+	res_settings.copy_texture = m_CopyTexture.GetCheck();
+	res_settings.custom_texture_format = m_CustomTextureFormat.GetCheck();
+	m_TextureFormat.GetWindowTextA(buffer_helper::global_buffer, BUFFER_SIZE);
+	res_settings.texture_format = buffer_helper::global_buffer;
 
 	//file mode apply
-	if (m_FileMode_All.GetCheck()) res_settings->file_mode = FILEMODE_ONEFILE;
-	else res_settings->file_mode = FILEMODE_MULTIFILE;
+	if (m_FileMode_All.GetCheck()) res_settings.file_mode = FILEMODE_ONEFILE;
+	else res_settings.file_mode = FILEMODE_MULTIFILE;
 
 	//export mode check
 	if (m_ExportMode_All.GetCheck() == 1)
-		res_settings->export_mode = EXPORTMODE_ALL;
+		res_settings.export_mode = EXPORTMODE_ALL;
 	else {
 		int gottenIndex = m_ExportList.GetCurSel();
 		if (gottenIndex == CB_ERR) {
 			MessageBoxA("You should specific a export target.", "Setting error", MB_OK + MB_ICONERROR);
 			return;
 		}
-		res_settings->selected_item = comboboxMirror[gottenIndex];
+		res_settings.selected_item = comboboxMirror[gottenIndex];
 
-		if (m_ExportMode_Object.GetCheck() == 1) res_settings->export_mode = EXPORTMODE_OBJECT;
-		else res_settings->export_mode = EXPORTMODE_GROUP;
+		if (m_ExportMode_Object.GetCheck() == 1) res_settings.export_mode = EXPORTMODE_OBJECT;
+		else res_settings.export_mode = EXPORTMODE_GROUP;
 	}
 
 	//export folder check
-	m_ExportFolder.GetWindowTextA(res_settings->export_folder, 65526);
-	if (res_settings->export_folder[0] == '\0') {
+	m_ExportFolder.GetWindowTextA(buffer_helper::global_buffer, BUFFER_SIZE);
+	res_settings.export_folder = buffer_helper::global_buffer;
+	if (res_settings.export_folder.empty()) {
 		MessageBoxA("Export folder should not be empty.", "Setting error", MB_OK + MB_ICONERROR);
 		return;
 	}
 	WIN32_FIND_DATA wfd;
-	HANDLE hFind = FindFirstFile(res_settings->export_folder, &wfd);
+	HANDLE hFind = FindFirstFile(res_settings.export_folder.c_str(), &wfd);
 	if (!((hFind != INVALID_HANDLE_VALUE) && (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))) {
 		MessageBoxA("Export folder should be existed!", "Setting error", MB_OK + MB_ICONERROR);
 		return;
@@ -202,13 +192,13 @@ void ExportSetting::func_DialogOK() {
 	FindClose(hFind);
 
 	//custom texture format check
-	if (res_settings->export_mtl && res_settings->export_texture && res_settings->custom_texture_format && res_settings->texture_format[0] == '\0') {
+	if (res_settings.export_mtl && res_settings.export_texture && res_settings.custom_texture_format && res_settings.texture_format.empty()) {
 		MessageBoxA("Texture format should not be empty.", "Setting error", MB_OK + MB_ICONERROR);
 		return;
 	}
 
 	//check pass. save current config and exit
-	SaveConfig();
+	config_manager::SaveConfig(&res_settings);
 	CDialogEx::OnOK();
 }
 
@@ -274,75 +264,6 @@ void ExportSetting::func_RefreshUI() {
 		m_Reposition_3dsmax.EnableWindow(FALSE);
 		m_Reposition_Blender.EnableWindow(FALSE);
 	}
-}
-
-void ExportSetting::LoadConfig() {
-	FILE* f = fopen(current_folder, "r");
-	if (f == NULL) {
-		//no config, set default and save it.
-		res_settings->export_mode = EXPORTMODE_ALL;
-		res_settings->selected_item = 0;
-		res_settings->file_mode = FILEMODE_MULTIFILE;
-		res_settings->export_folder[0] = '\0';
-		res_settings->omit_transform = TRUE;
-		res_settings->right_hand = TRUE;
-		res_settings->reposition_3dsmax = FALSE;
-		res_settings->reposition_blender = FALSE;
-		res_settings->export_mtl = TRUE;
-		res_settings->export_texture = TRUE;
-		res_settings->copy_texture = FALSE;
-		res_settings->custom_texture_format = TRUE;
-		strcpy(res_settings->texture_format, "bmp");
-
-		SaveConfig();
-		return;
-	}
-
-	//read config
-	res_settings->selected_item = 0;
-
-#define trimLinebreaker(arr) arr[strlen(arr)-1]='\0';
-#define readint(target,conv) fgets(intcache, 12, f);trimLinebreaker(intcache);target=(conv)atoi(intcache);
-
-	char intcache[12];
-	readint(res_settings->export_mode, ExportMode);
-	readint(res_settings->file_mode, FileMode);
-	fgets(res_settings->export_folder, 65526, f);  trimLinebreaker(res_settings->export_folder);
-	readint(res_settings->omit_transform, BOOL);
-	readint(res_settings->right_hand, BOOL);
-	readint(res_settings->reposition_3dsmax, BOOL);
-	readint(res_settings->reposition_blender, BOOL);
-	readint(res_settings->export_mtl, BOOL);
-	readint(res_settings->export_texture, BOOL);
-	readint(res_settings->copy_texture, BOOL);
-	readint(res_settings->custom_texture_format, BOOL);
-	fgets(res_settings->texture_format, 32, f);  trimLinebreaker(res_settings->texture_format);
-
-	fclose(f);
-}
-
-void ExportSetting::SaveConfig() {
-	FILE* f = fopen(current_folder, "w");
-	assert(f != NULL);
-
-#define writeint(target) itoa((int)target, intcache, 10);fputs(intcache, f);fputs("\n", f);
-#define writestr(target) fputs(target, f);fputs("\n", f);
-
-	char intcache[12];
-	writeint(res_settings->export_mode);
-	writeint(res_settings->file_mode);
-	writestr(res_settings->export_folder);
-	writeint(res_settings->omit_transform);
-	writeint(res_settings->right_hand);
-	writeint(res_settings->reposition_3dsmax);
-	writeint(res_settings->reposition_blender);
-	writeint(res_settings->export_mtl);
-	writeint(res_settings->export_texture);
-	writeint(res_settings->copy_texture);
-	writeint(res_settings->custom_texture_format);
-	writestr(res_settings->texture_format);
-
-	fclose(f);
 }
 
 #pragma endregion

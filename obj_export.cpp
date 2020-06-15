@@ -1,4 +1,6 @@
 #include "obj_export.h"
+#include "buffer_helper.h"
+#include <filesystem>
 #include <exception>
 #pragma warning(disable:6387)
 
@@ -10,14 +12,8 @@ obj_export::obj_export() {
 	cfg = NULL;
 	ctx = NULL;
 	matList = new std::set<CK_ID>();
-	path_help = (char*)calloc(65526, sizeof(char));
-	name_help = (char*)calloc(255, sizeof(char));
-	if (path_help == NULL || name_help == NULL)
-		throw std::bad_alloc();
 }
 obj_export::~obj_export() {
-	free(path_help);
-	free(name_help);
 	delete matList;
 }
 
@@ -126,10 +122,11 @@ void obj_export::ExportObjectWarpper() {
 void obj_export::StartReposition() {
 	if ((!cfg->omit_transform) || (!cfg->right_hand)) return;
 
+	std::filesystem::path filepath;
 	if (cfg->reposition_3dsmax) {
-		strcpy(path_help, cfg->export_folder);
-		strcat(path_help, "\\3dsmax.ms");
-		frepos_3dsmax = fopen(path_help, "w");
+		filepath = cfg->export_folder;
+		filepath /= "3dsmax.ms";
+		frepos_3dsmax = fopen(filepath.string().c_str(), "w");
 		if (frepos_3dsmax == NULL) throw std::bad_alloc();
 
 		//write header
@@ -138,9 +135,9 @@ void obj_export::StartReposition() {
 		fputs(")\n", frepos_3dsmax);
 	}
 	if (cfg->reposition_blender) {
-		strcpy(path_help, cfg->export_folder);
-		strcat(path_help, "\\blender.py");
-		frepos_blender = fopen(path_help, "w");
+		filepath = cfg->export_folder;
+		filepath /= "blender.py";
+		frepos_blender = fopen(filepath.string().c_str(), "w");
 		if (frepos_blender == NULL) throw std::bad_alloc();
 
 		//write header
@@ -157,9 +154,10 @@ void obj_export::NextRepostion(CK3dEntity* obj) {
 	if (frepos_3dsmax != NULL) {
 		//todo: finish 3ds max repostion export
 		VxMatrix cacheMat = obj->GetWorldMatrix();
-		GenerateObjName(obj, name_help);
+		GenerateObjName(obj, buffer_helper::misc_buffer);
+		ObjectNameUniform(buffer_helper::misc_buffer);
 		fprintf(frepos_3dsmax, "tryModify $%s (matrix3 [%f, %f, %f] [%f, %f, %f] [%f, %f, %f] [%f, %f, %f])\n",
-			name_help,
+			buffer_helper::misc_buffer,
 			cacheMat[0][0], cacheMat[0][2], cacheMat[0][1],
 			cacheMat[2][0], cacheMat[2][2], cacheMat[2][1],
 			cacheMat[1][0], cacheMat[1][2], cacheMat[1][1],
@@ -167,9 +165,10 @@ void obj_export::NextRepostion(CK3dEntity* obj) {
 	}
 	if (frepos_blender != NULL) {
 		VxMatrix cacheMat = obj->GetWorldMatrix();
-		GenerateObjName(obj, name_help);
+		GenerateObjName(obj, buffer_helper::misc_buffer);
+		ObjectNameUniform(buffer_helper::misc_buffer);
 		fprintf(frepos_blender, "tryModify('%s', Matrix(((%f, %f, %f, %f), (%f, %f, %f, %f), (%f, %f, %f, %f), (%f, %f, %f, %f))))\n",
-			name_help,
+			buffer_helper::misc_buffer,
 			cacheMat[0][0], cacheMat[0][2], cacheMat[0][1], cacheMat[0][3],
 			cacheMat[2][0], cacheMat[2][2], cacheMat[2][1], cacheMat[2][3],
 			cacheMat[1][0], cacheMat[1][2], cacheMat[1][1], cacheMat[1][3],
@@ -191,8 +190,11 @@ void obj_export::EndRepostition() {
 void obj_export::StartFile(FILE** fs, char* suffix) {
 	if (cfg->file_mode == FILEMODE_ONEFILE) {
 		if (*fs == NULL) {
-			sprintf(path_help, "%s\\all.%s", cfg->export_folder, suffix);
-			*fs = fopen(path_help, "w");
+			std::filesystem::path fp(cfg->export_folder);
+			sprintf(buffer_helper::misc_buffer, "all.%s", suffix);
+			fp /= buffer_helper::misc_buffer;
+
+			*fs = fopen(fp.string().c_str(), "w");
 			if (*fs == NULL) throw std::bad_alloc();
 		}
 	}
@@ -203,10 +205,13 @@ void obj_export::NextFile(FILE** fs, char* name, char* suffix) {
 		if (*fs != NULL) fclose(*fs);
 
 		//open new file
-		strcpy(name_help, name);
-		FileNameUniform(name_help);
-		sprintf(path_help, "%s\\%s.%s", cfg->export_folder, name_help, suffix);
-		*fs = fopen(path_help, "w");
+		std::filesystem::path fp(cfg->export_folder);
+		strcpy(buffer_helper::misc_buffer, name);
+		FileNameUniform(buffer_helper::misc_buffer);
+		sprintf(buffer_helper::misc_buffer2, "%s.%s", buffer_helper::misc_buffer, suffix);
+		fp /= buffer_helper::misc_buffer2;
+
+		*fs = fopen(fp.string().c_str(), "w");
 		if (*fs == NULL) throw std::bad_alloc();
 	}
 }
@@ -229,11 +234,11 @@ void obj_export::ExportObject(CK3dEntity* obj, int* storedV) {
 	if (voffset == 0) {
 		//the first obj, add mtllib
 		if (cfg->file_mode == FILEMODE_MULTIFILE) {
-			strcpy(name_help, obj->GetName());
-			FileNameUniform(name_help);
-		} else strcpy(name_help, "all");
+			strcpy(buffer_helper::export_buffer, obj->GetName());
+			FileNameUniform(buffer_helper::export_buffer);
+		} else strcpy(buffer_helper::export_buffer, "all");
 		if (cfg->export_mtl)
-			fprintf(fObj, "mtllib %s.mtl\n", name_help);
+			fprintf(fObj, "mtllib %s.mtl\n", buffer_helper::export_buffer);
 	}
 
 #define righthand_pos_converter(condition,y,z) (condition ? z : y), (condition ? y : z)
@@ -266,8 +271,9 @@ void obj_export::ExportObject(CK3dEntity* obj, int* storedV) {
 	}
 
 	//g
-	GenerateObjName(obj, name_help);
-	fprintf(fObj, "g %s\n", name_help);
+	GenerateObjName(obj, buffer_helper::export_buffer);
+	ObjectNameUniform(buffer_helper::export_buffer);
+	fprintf(fObj, "g %s\n", buffer_helper::export_buffer);
 
 	//f and usemtl
 	count = mesh->GetFaceCount();
@@ -284,8 +290,9 @@ void obj_export::ExportObject(CK3dEntity* obj, int* storedV) {
 			CKMaterial* fmtl = mesh->GetFaceMaterial(i);
 			if (fmtl != NULL) {
 				matList->insert(fmtl->GetID());
-				GenerateMtlName(fmtl, name_help);
-				fprintf(fObj, "usemtl %s\n", name_help);
+				GenerateMtlName(fmtl, buffer_helper::export_buffer);
+				ObjectNameUniform(buffer_helper::export_buffer);
+				fprintf(fObj, "usemtl %s\n", buffer_helper::export_buffer);
 			} else fputs("usemtl off\n", fObj);
 		}
 
@@ -320,8 +327,9 @@ void obj_export::ExportMaterial() {
 }
 void obj_export::ExportMaterial(CKMaterial* mtl) {
 	//basic
-	GenerateMtlName(mtl, name_help);
-	fprintf(fMtl, "newmtl %s\n", name_help);
+	GenerateMtlName(mtl, buffer_helper::export_buffer);
+	ObjectNameUniform(buffer_helper::export_buffer);
+	fprintf(fMtl, "newmtl %s\n", buffer_helper::export_buffer);
 	VxColor col = mtl->GetAmbient();
 	fprintf(fMtl, "Ka %f %f %f\n", col.r, col.g, col.b);
 	col = mtl->GetDiffuse();
@@ -334,17 +342,17 @@ void obj_export::ExportMaterial(CKMaterial* mtl) {
 	CKTexture* texture = mtl->GetTexture();
 	if (texture == NULL) return;
 
-	if (cfg->custom_texture_format) GenerateTextureName(texture, name_help, cfg->texture_format);
-	else GenerateTextureName(texture, name_help, NULL);
+	if (cfg->custom_texture_format) GenerateTextureName(texture, buffer_helper::export_buffer, cfg->texture_format.c_str());
+	else GenerateTextureName(texture, buffer_helper::export_buffer, NULL);
 
-	fprintf(fMtl, "map_Kd %s\n", name_help);
+	fprintf(fMtl, "map_Kd %s\n", buffer_helper::export_buffer);
 
 	//export texture
 	if (!cfg->copy_texture) return;
-	sprintf(path_help, "%s\\%s", cfg->export_folder, name_help);
-	//if (cfg->save_alpha) texture->SaveImageAlpha(nameingHlp, 0);
-	//else texture->SaveImage(nameingHlp, 0, !cfg->custom_texture_format);
-	texture->SaveImage(path_help, 0, FALSE);
+	std::filesystem::path fp(cfg->export_folder);
+	fp /= buffer_helper::export_buffer;
+	strcpy(buffer_helper::export_buffer, fp.string().c_str());
+	texture->SaveImage(buffer_helper::export_buffer, 0, FALSE);
 
 }
 
@@ -356,20 +364,32 @@ BOOL obj_export::JudgeValidObject(CK3dEntity* obj) {
 	return TRUE;
 }
 void obj_export::GenerateObjName(CK3dEntity* obj, char* name) {
-	sprintf(name, "obj%d_%s", obj->GetID(), obj->GetName());
-	ObjectNameUniform(name);
+	if (cfg->name_prefix)
+		sprintf(name, "obj%d_%s", obj->GetID(), obj->GetName());
+	else
+		strcpy(name, obj->GetName());
 }
 void obj_export::GenerateMtlName(CKMaterial* obj, char* name) {
-	sprintf(name, "mtl%d_%s", obj->GetID(), obj->GetName());
-	ObjectNameUniform(name);
+	if (cfg->name_prefix)
+		sprintf(name, "mtl%d_%s", obj->GetID(), obj->GetName());
+	else
+		strcpy(name, obj->GetName());
 }
-void obj_export::GenerateTextureName(CKTexture* obj, char* name, char* suffix) {
-	strcpy(name, obj->GetName());
-	FileNameUniform(name);
-	if (suffix != NULL) {
-		strcat(name, ".");
-		strcat(name, suffix);
+void obj_export::GenerateTextureName(CKTexture* obj, char* name, const char* suffix) {
+	std::string file;
+	std::filesystem::path filepath;
+
+	file = obj->GetSlotFileName(0);
+	if (file.find('\\') != file.npos) {
+		filepath = file;
+		file = filepath.filename().string();
 	}
+
+	if (suffix != NULL) {
+		file.append(".");
+		file.append(suffix);
+	}
+	strcpy(name, file.c_str());
 }
 void obj_export::ObjectNameUniform(char* str) {
 	int len = strlen(str);

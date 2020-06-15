@@ -65,6 +65,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;TARGET_VT35;VX_MEM_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -88,6 +89,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;TARGET_VT5;VX_MEM_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -100,6 +102,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="buffer_helper.h" />
+    <ClInclude Include="config_manager.h" />
     <ClInclude Include="export_setting.h" />
     <ClInclude Include="obj_export.h" />
     <ClInclude Include="resource.h" />
@@ -107,6 +111,8 @@
     <ClInclude Include="vt_menu.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="buffer_helper.cpp" />
+    <ClCompile Include="config_manager.cpp" />
     <ClCompile Include="export_setting.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="obj_export.cpp" />

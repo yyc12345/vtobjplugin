@@ -39,6 +39,7 @@ class ExportSetting : public CDialogEx {
 	//=============object setting
 	CButton m_OmitTransform;
 	CButton m_RightHand;
+	CButton m_NamePrefix;
 
 	//=============reposition setting
 	CButton m_Reposition_3dsmax;
@@ -58,16 +59,12 @@ class ExportSetting : public CDialogEx {
 	afx_msg void func_ChangeExportMode();
 	afx_msg void func_RefreshUI();
 
-	ExportConfig* res_settings;
+	ExportConfig res_settings;
 
 	private:
 	CKContext* context;
 	std::vector<CK_ID> comboboxMirror;
 	int cache_ExportMode;
-	char* current_folder;
-
-	void SaveConfig();
-	void LoadConfig();
 	
 };
 #endif

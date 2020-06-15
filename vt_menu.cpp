@@ -66,8 +66,8 @@ void PluginMenuCallback(int commandID) {
 			return;
 		}
 
-		exporter->Ready4Export(ctx, es->res_settings);
-		switch (es->res_settings->export_mode) {
+		exporter->Ready4Export(ctx, &(es->res_settings));
+		switch (es->res_settings.export_mode) {
 			case EXPORTMODE_ALL:
 				exporter->ExportAllWarpper();
 				break;
@@ -84,7 +84,7 @@ void PluginMenuCallback(int commandID) {
 	} else if (commandID == 1)
 		ShellExecute(NULL, "open", "https://github.com/yyc12345/vtobjplugin/issues", NULL, NULL, SW_SHOWNORMAL);
 	else if (commandID == 2)
-		AfxMessageBox("vtobjplugin - An OBJ export plugin for Virtools.\nUnder GPL v3 License.\nProject homepage: https://github.com/yyc12345/vtobjplugin", MB_ICONINFORMATION + MB_OK);
+		AfxMessageBox("vtobjplugin v1.3 - An OBJ export plugin for Virtools.\nUnder GPL v3 License.\nProject homepage: https://github.com/yyc12345/vtobjplugin", MB_ICONINFORMATION + MB_OK);
 	else;
 
 }
