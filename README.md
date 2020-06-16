@@ -94,4 +94,8 @@ It is strongly not recommended that you compile by yourself unless you know Virt
 
 ## Develop plan
 
-Current version is v1.3. There are no plan for futher development.
+Current version is v1.3. The following features will be added in the following version.
+
+* Support choosing from `g` and `o` to split object.
+* Export alpha channel in tga texture.
+* Improve the action that shared texture will be write to target folder per using. Recude IO operations.
