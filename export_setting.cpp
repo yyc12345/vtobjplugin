@@ -225,7 +225,12 @@ void ExportSetting::func_ChangeExportMode() {
 		count = objArray.Size();
 		for (int i = 0; i < count; i++) {
 			comboboxMirror.push_back(objArray[i]->GetID());
-			m_ExportList.AddString(objArray[i]->GetName());
+			if (objArray[i]->GetName() != NULL) 
+				m_ExportList.AddString(objArray[i]->GetName());
+			else {
+				sprintf(buffer_helper::global_buffer, "[unnamed 3d object] (CKID: %d)", objArray[i]->GetID());
+				m_ExportList.AddString(buffer_helper::global_buffer);
+			}
 		}
 	} else if (m_ExportMode_Group.GetCheck() == 1) {
 		count = context->GetObjectsCountByClassID(CKCID_GROUP);
@@ -233,7 +238,12 @@ void ExportSetting::func_ChangeExportMode() {
 		//iterate
 		for (int i = 0; i < count; i++) {
 			comboboxMirror.push_back(idList[i]);
-			m_ExportList.AddString(context->GetObjectA(idList[i])->GetName());
+			if (context->GetObjectA(idList[i])->GetName() != NULL)
+				m_ExportList.AddString(context->GetObjectA(idList[i])->GetName());
+			else {
+				sprintf(buffer_helper::global_buffer, "[unnamed group] (CKID: %d)", idList[i]);
+				m_ExportList.AddString(buffer_helper::global_buffer);
+			}
 		}
 	} else return;
 
