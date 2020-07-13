@@ -340,7 +340,9 @@ void obj_export::ExportMaterial(CKMaterial* mtl) {
 	//set up texture
 	if (!cfg->export_texture) return;
 	CKTexture* texture = mtl->GetTexture();
+	//if texture is not existed, next material
 	if (texture == NULL) return;
+	if (texture->GetSlotFileName(0) == NULL) return;
 
 	if (cfg->custom_texture_format) GenerateTextureName(texture, buffer_helper::export_buffer, cfg->texture_format.c_str());
 	else GenerateTextureName(texture, buffer_helper::export_buffer, NULL);
@@ -365,13 +367,13 @@ BOOL obj_export::JudgeValidObject(CK3dEntity* obj) {
 }
 void obj_export::GenerateObjName(CK3dEntity* obj, char* name) {
 	if (cfg->name_prefix)
-		sprintf(name, "obj%d_%s", obj->GetID(), obj->GetName());
+		sprintf(name, "obj%d_%s", obj->GetID(), obj->GetName() == NULL ? "noname_3d_object" : obj->GetName());
 	else
 		strcpy(name, obj->GetName());
 }
 void obj_export::GenerateMtlName(CKMaterial* obj, char* name) {
 	if (cfg->name_prefix)
-		sprintf(name, "mtl%d_%s", obj->GetID(), obj->GetName());
+		sprintf(name, "mtl%d_%s", obj->GetID(), obj->GetName() == NULL ? "noname_material" : obj->GetName());
 	else
 		strcpy(name, obj->GetName());
 }
