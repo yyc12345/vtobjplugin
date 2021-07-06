@@ -113,8 +113,8 @@ BOOL ExportSetting::OnInitDialog() {
 	m_CustomTextureFormat.SetCheck(res_settings.custom_texture_format);
 	m_TextureFormat.SetWindowTextA(res_settings.texture_format.c_str());
 
-	this->func_RefreshUI();
 	this->func_ChangeExportMode();
+	//this->func_RefreshUI(); // func_ChangeExportMode has called this.
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // 异常: OCX 属性页应返回 FALSE
@@ -245,9 +245,9 @@ void ExportSetting::func_ChangeExportMode() {
 				m_ExportList.AddString(buffer_helper::global_buffer);
 			}
 		}
-	} else return;
+	}
 
-
+	func_RefreshUI();
 }
 
 void ExportSetting::func_RefreshUI() {
@@ -274,6 +274,9 @@ void ExportSetting::func_RefreshUI() {
 		m_Reposition_3dsmax.EnableWindow(FALSE);
 		m_Reposition_Blender.EnableWindow(FALSE);
 	}
+
+	// export mode for combobox
+	m_ExportList.EnableWindow(!m_ExportMode_All.GetCheck());
 }
 
 #pragma endregion
