@@ -58,19 +58,19 @@ void config_manager::LoadConfig(ExportConfig* cfg) {
 
 needInitCfg:
 	//no config, set default and save it.
-	cfg->export_mode = EXPORTMODE_ALL;
+	cfg->export_mode = EXPORTMODE_GROUP;
 	cfg->selected_item = 0;
-	cfg->file_mode = FILEMODE_MULTIFILE;
+	cfg->file_mode = FILEMODE_ONEFILE;
 	cfg->export_folder = "";
 	cfg->omit_transform = TRUE;
 	cfg->right_hand = TRUE;
-	cfg->name_prefix = TRUE;
+	cfg->name_prefix = FALSE;
 	cfg->reposition_3dsmax = FALSE;
 	cfg->reposition_blender = FALSE;
 	cfg->export_mtl = TRUE;
 	cfg->export_texture = TRUE;
 	cfg->copy_texture = FALSE;
-	cfg->custom_texture_format = TRUE;
+	cfg->custom_texture_format = FALSE;
 	cfg->texture_format = "bmp";
 
 	SaveConfig(cfg);
