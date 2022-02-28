@@ -202,6 +202,7 @@
     <ClInclude Include="obj_export.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="string_helper.h" />
     <ClInclude Include="vt_menu.h" />
   </ItemGroup>
   <ItemGroup>
@@ -210,6 +211,7 @@
     <ClCompile Include="export_setting.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="obj_export.cpp" />
+    <ClCompile Include="string_helper.cpp" />
     <ClCompile Include="vt_menu.cpp" />
   </ItemGroup>
   <ItemGroup>

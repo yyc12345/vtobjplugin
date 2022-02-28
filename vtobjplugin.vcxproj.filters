@@ -36,6 +36,9 @@
     <ClInclude Include="buffer_helper.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="string_helper.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -54,6 +57,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="buffer_helper.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="string_helper.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
