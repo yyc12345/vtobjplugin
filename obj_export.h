@@ -25,6 +25,8 @@ typedef struct {
 	BOOL omit_transform;
 	BOOL right_hand;
 	BOOL name_prefix;
+	BOOL use_group_split_object;
+	BOOL eliminate_non_ascii;
 
 	BOOL reposition_3dsmax;
 	BOOL reposition_blender;
@@ -34,6 +36,11 @@ typedef struct {
 	BOOL copy_texture;
 	BOOL custom_texture_format;
 	std::string texture_format;
+
+	BOOL use_custom_encoding;
+	UINT composition_encoding;
+	BOOL use_utf8_obj;
+	BOOL use_utf8_script;
 
 }ExportConfig;
 

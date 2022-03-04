@@ -1,6 +1,7 @@
 #if !defined(_YYCDLL_STRING_HELPER_H__IMPORTED_)
 #define _YYCDLL_STRING_HELPER_H__IMPORTED_
 
+#include "stdafx.h"
 #include <string>
 #include <stringapiset.h>
 

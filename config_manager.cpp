@@ -3,30 +3,31 @@
 #include "buffer_helper.h"
 #include <filesystem>
 
-#define APP_VERSION 130
+#define APP_VERSION 140
 
 extern PluginInterface* s_Plugininterface;
 
-void config_manager::GetConfigFilePath(char* buffer) {
+void config_manager::GetConfigFilePath(std::string* buffer) {
 	std::filesystem::path file(s_Plugininterface->GetVirtoolsDirectory());
 	file /= "vtobjplugin.cfg";
-	strcpy(buffer, file.string().c_str());
+	(*buffer) = file.string().c_str();
 }
 
 void config_manager::LoadConfig(ExportConfig* cfg) {
-	GetConfigFilePath(buffer_helper::global_buffer);
-
 	// init necessary variable before goto
-	std::string temp_str;
+	std::string temp_str, cfg_file_path;
 	int temp_int = 0;
 	int gotten_version;
 
-	FILE* f = fopen(buffer_helper::global_buffer, "rb");
+	GetConfigFilePath(&cfg_file_path);
+	FILE* f = fopen(cfg_file_path.c_str(), "rb");
 	if (f == NULL) goto needInitCfg;
 
 	//read config
 #define readint(target,conv) fread(&target, sizeof(int), 1, f);
-#define readstr(target) fread(&temp_int, sizeof(size_t), 1, f);fread(buffer_helper::global_buffer, sizeof(char), temp_int, f);buffer_helper::global_buffer[temp_int]='\0';target=buffer_helper::global_buffer;
+#define readstr(target) fread(&temp_int, sizeof(size_t), 1, f);\
+	target.resize(temp_int);\
+	fread(target.data(), sizeof(char), temp_int, f);\
 
 	//check version
 	readint(gotten_version);
@@ -42,6 +43,8 @@ void config_manager::LoadConfig(ExportConfig* cfg) {
 	readint(cfg->omit_transform, BOOL);
 	readint(cfg->right_hand, BOOL);
 	readint(cfg->name_prefix, BOOL);
+	readint(cfg->use_group_split_object, BOOL);
+	readint(cfg->eliminate_non_ascii, BOOL);
 	readint(cfg->reposition_3dsmax, BOOL);
 	readint(cfg->reposition_blender, BOOL);
 	readint(cfg->export_mtl, BOOL);
@@ -49,6 +52,10 @@ void config_manager::LoadConfig(ExportConfig* cfg) {
 	readint(cfg->copy_texture, BOOL);
 	readint(cfg->custom_texture_format, BOOL);
 	readstr(cfg->texture_format);
+	readint(cfg->use_custom_encoding, BOOL);
+	readint(cfg->composition_encoding, UINT);
+	readint(cfg->use_utf8_obj, BOOL);
+	readint(cfg->use_utf8_script, BOOL);
 
 #undef readint
 #undef readstr
@@ -65,6 +72,8 @@ needInitCfg:
 	cfg->omit_transform = TRUE;
 	cfg->right_hand = TRUE;
 	cfg->name_prefix = FALSE;
+	cfg->use_group_split_object = TRUE;
+	cfg->use_group_split_object = FALSE;
 	cfg->reposition_3dsmax = FALSE;
 	cfg->reposition_blender = FALSE;
 	cfg->export_mtl = TRUE;
@@ -72,15 +81,19 @@ needInitCfg:
 	cfg->copy_texture = FALSE;
 	cfg->custom_texture_format = FALSE;
 	cfg->texture_format = "bmp";
+	cfg->use_custom_encoding = FALSE;
+	cfg->composition_encoding = CP_ACP;
+	cfg->use_utf8_obj = FALSE;
+	cfg->use_utf8_script = FALSE;
 
 	SaveConfig(cfg);
 	return;
 }
 
 void config_manager::SaveConfig(ExportConfig* cfg) {
-	GetConfigFilePath(buffer_helper::global_buffer);
-
-	FILE* f = fopen(buffer_helper::global_buffer, "wb");
+	std::string cfg_file_path;
+	GetConfigFilePath(&cfg_file_path);
+	FILE* f = fopen(cfg_file_path.c_str(), "wb");
 	assert(f != NULL);
 
 	const char* temp_str = NULL;
@@ -96,6 +109,8 @@ void config_manager::SaveConfig(ExportConfig* cfg) {
 	writeint(cfg->omit_transform);
 	writeint(cfg->right_hand);
 	writeint(cfg->name_prefix);
+	writeint(cfg->use_group_split_object);
+	writeint(cfg->eliminate_non_ascii);
 	writeint(cfg->reposition_3dsmax);
 	writeint(cfg->reposition_blender);
 	writeint(cfg->export_mtl);
@@ -103,6 +118,10 @@ void config_manager::SaveConfig(ExportConfig* cfg) {
 	writeint(cfg->copy_texture);
 	writeint(cfg->custom_texture_format);
 	writestr(cfg->texture_format.c_str());
+	writeint(cfg->use_custom_encoding);
+	writeint(cfg->composition_encoding);
+	writeint(cfg->use_utf8_obj);
+	writeint(cfg->use_utf8_script);
 
 #undef writeconstint
 #undef writeint

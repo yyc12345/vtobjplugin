@@ -40,6 +40,9 @@ void ExportSetting::DoDataExchange(CDataExchange* pDX) {
 	DDX_Control(pDX, IDC_CHECK2, m_OmitTransform);
 	DDX_Control(pDX, IDC_CHECK4, m_RightHand);
 	DDX_Control(pDX, IDC_CHECK9, m_NamePrefix);
+	DDX_Control(pDX, IDC_RADIO6, m_SplitMode_Group);
+	DDX_Control(pDX, IDC_RADIO7, m_SplitMode_Object);
+	DDX_Control(pDX, IDC_CHECK10, m_EliminateNonAscii);
 
 	//=============reposition setting
 	DDX_Control(pDX, IDC_CHECK7, m_Reposition_3dsmax);
@@ -52,6 +55,12 @@ void ExportSetting::DoDataExchange(CDataExchange* pDX) {
 	DDX_Control(pDX, IDC_CHECK5, m_CustomTextureFormat);
 	DDX_Control(pDX, IDC_EDIT2, m_TextureFormat);
 
+	//=============encoding setting
+	DDX_Control(pDX, IDC_RADIO8, m_EncodingType_System);
+	DDX_Control(pDX, IDC_RADIO9, m_EncodingType_Custom);
+	DDX_Control(pDX, IDC_EDIT3, m_CustomEncoding);
+	DDX_Control(pDX, IDC_CHECK11, m_Encoding_UTF8Object);
+	DDX_Control(pDX, IDC_CHECK12, m_Encoding_UTF8Script);
 }
 
 
@@ -70,6 +79,8 @@ BEGIN_MESSAGE_MAP(ExportSetting, CDialogEx)
 	ON_BN_CLICKED(IDC_CHECK5, &ExportSetting::func_RefreshUI)
 	ON_BN_CLICKED(IDC_CHECK2, &ExportSetting::func_RefreshUI)
 	ON_BN_CLICKED(IDC_CHECK4, &ExportSetting::func_RefreshUI)
+	ON_BN_CLICKED(IDC_RADIO8, &ExportSetting::func_RefreshUI)
+	ON_BN_CLICKED(IDC_RADIO9, &ExportSetting::func_RefreshUI)
 END_MESSAGE_MAP()
 
 
@@ -100,9 +111,15 @@ BOOL ExportSetting::OnInitDialog() {
 	}
 	m_ExportFolder.SetWindowTextA(res_settings.export_folder.c_str());
 
+	if (res_settings.use_group_split_object) {
+		m_SplitMode_Object.SetCheck(1);
+	} else {
+		m_SplitMode_Group.SetCheck(1);
+	}
 	m_OmitTransform.SetCheck(res_settings.omit_transform);
 	m_RightHand.SetCheck(res_settings.right_hand);
 	m_NamePrefix.SetCheck(res_settings.name_prefix);
+	m_EliminateNonAscii.SetCheck(res_settings.eliminate_non_ascii);
 
 	m_Reposition_3dsmax.SetCheck(res_settings.reposition_3dsmax);
 	m_Reposition_Blender.SetCheck(res_settings.reposition_blender);
@@ -112,6 +129,15 @@ BOOL ExportSetting::OnInitDialog() {
 	m_CopyTexture.SetCheck(res_settings.copy_texture);
 	m_CustomTextureFormat.SetCheck(res_settings.custom_texture_format);
 	m_TextureFormat.SetWindowTextA(res_settings.texture_format.c_str());
+
+	if (res_settings.use_custom_encoding) {
+		m_EncodingType_Custom.SetCheck(1);
+	} else {
+		m_EncodingType_System.SetCheck(1);
+	}
+	m_Encoding_UTF8Object.SetCheck(res_settings.use_utf8_obj);
+	m_Encoding_UTF8Script.SetCheck(res_settings.use_utf8_script);
+
 
 	this->func_ChangeExportMode();
 	//this->func_RefreshUI(); // func_ChangeExportMode has called this.
@@ -274,6 +300,10 @@ void ExportSetting::func_RefreshUI() {
 		m_Reposition_3dsmax.EnableWindow(FALSE);
 		m_Reposition_Blender.EnableWindow(FALSE);
 	}
+
+	//encoding field
+	if (m_EncodingType_System.GetCheck()) m_CustomEncoding.EnableWindow(FALSE);
+	else m_CustomEncoding.EnableWindow(TRUE);
 
 	// export mode for combobox
 	m_ExportList.EnableWindow(!m_ExportMode_All.GetCheck());

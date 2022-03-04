@@ -4,6 +4,10 @@
 
 namespace string_helper {
 
+	void write_utf8bom(FILE* fs) {
+		fputs("\xef\xbb\xbf", fs);
+	}
+
 	void stdstring_sprintf(std::string* strl, const char* format, ...) {
 		va_list argptr;
 		va_start(argptr, format);
@@ -11,8 +15,8 @@ namespace string_helper {
 		count++;
 		va_end(argptr);
 
-		strl->clear();
 		strl->resize(count);
+		(*strl)[count - 1] = '\0';
 		va_start(argptr, format);
 		int write_result = _vsnprintf(strl->data(), count, format, argptr);
 		va_end(argptr);
@@ -24,19 +28,17 @@ namespace string_helper {
 		std::wstring wscache;
 
 		int count, wcount, write_result;
-
+		
 		// convert to WCHAR
 		wcount = MultiByteToWideChar(origCP, 0, orig->c_str(), -1, NULL, 0);
 		if (wcount <= 0) throw new std::logic_error("Invalid count in MultiByteToWideChar.");
-		wscache.clear();
-		wscache.reserve(count);
+		wscache.reserve(wcount);
 		write_result = MultiByteToWideChar(origCP, 0, orig->c_str(), -1, wscache.data(), wcount);
 		if (write_result <= 0) throw new std::length_error("Invalid write_result in MultiByteToWideChar.");
 
 		//converter to CHAR
 		count = WideCharToMultiByte(destCP, 0, wscache.c_str(), -1, NULL, 0, NULL, NULL);
 		if (wcount <= 0) throw new std::logic_error("Invalid count in WideCharToMultiByte.");
-		dest->clear();
 		dest->resize(count);
 		write_result = WideCharToMultiByte(destCP, 0, wscache.c_str(), -1, dest->data(), count, NULL, NULL);
 		if (write_result <= 0) throw new std::length_error("Invalid write_result in WideCharToMultiByte.");

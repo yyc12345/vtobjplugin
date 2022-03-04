@@ -40,6 +40,9 @@ class ExportSetting : public CDialogEx {
 	CButton m_OmitTransform;
 	CButton m_RightHand;
 	CButton m_NamePrefix;
+	CButton m_SplitMode_Group;
+	CButton m_SplitMode_Object;
+	CButton m_EliminateNonAscii;
 
 	//=============reposition setting
 	CButton m_Reposition_3dsmax;
@@ -51,6 +54,13 @@ class ExportSetting : public CDialogEx {
 	CButton m_CopyTexture;
 	CButton m_CustomTextureFormat;
 	CEdit m_TextureFormat;
+
+	//=============encoding setting
+	CButton m_EncodingType_System;
+	CButton m_EncodingType_Custom;
+	CEdit m_CustomEncoding;
+	CButton m_Encoding_UTF8Object;
+	CButton m_Encoding_UTF8Script;
 
 	virtual BOOL OnInitDialog();
 	afx_msg void func_ExportFolderBroswer();

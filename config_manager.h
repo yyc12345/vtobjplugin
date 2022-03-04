@@ -5,7 +5,7 @@
 
 namespace config_manager {
 
-	void GetConfigFilePath(char* buffer);
+	void GetConfigFilePath(std::string* buffer);
 	void SaveConfig(ExportConfig* cfg);
 	void LoadConfig(ExportConfig* cfg);
 
