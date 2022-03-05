@@ -33,9 +33,6 @@
     <ClInclude Include="config_manager.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="buffer_helper.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="string_helper.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -54,9 +51,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="config_manager.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="buffer_helper.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="string_helper.cpp">

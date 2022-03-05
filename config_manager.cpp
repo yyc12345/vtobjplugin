@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "config_manager.h"
-#include "buffer_helper.h"
 #include <filesystem>
 
 #define APP_VERSION 140
@@ -30,7 +29,7 @@ void config_manager::LoadConfig(ExportConfig* cfg) {
 	fread(target.data(), sizeof(char), temp_int, f);\
 
 	//check version
-	readint(gotten_version);
+	readint(gotten_version, int);
 	if (gotten_version != APP_VERSION) {
 		fclose(f);
 		goto needInitCfg;

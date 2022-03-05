@@ -5,6 +5,8 @@
 #include <string>
 #include <set>
 
+#pragma warning(disable:26812)
+
 enum ExportMode {
 	EXPORTMODE_OBJECT,
 	EXPORTMODE_GROUP,
@@ -67,18 +69,18 @@ class obj_export {
 	void ExportMaterial();
 	void ExportMaterial(CKMaterial* mtl);
 
-	BOOL JudgeValidObject(CK3dEntity* obj);
-	void GenerateObjName(CK3dEntity* obj, char* name);
-	void GenerateMtlName(CKMaterial* obj, char* name);
-	void GenerateTextureName(CKTexture* obj, char* name, const char* suffix);
-	void ObjectNameUniform(char* str);
-	void FileNameUniform(char* str);
+	BOOL ValidateObjectLegal(CK3dEntity* obj);
+	void GenerateObjName(CK3dEntity* obj, BOOL as_utf8, std::string* name);
+	void GenerateMtlName(CKMaterial* obj, BOOL as_utf8, std::string* name);
+	void GenerateTextureName(CKTexture* obj, BOOL as_utf8, std::string* name);
+	void ObjectNameUniform(std::string* str);
+	void FileNameUniform(std::string* str);
 
 	FILE* fObj;
 	FILE* fMtl;
 	FILE* frepos_3dsmax;
 	FILE* frepos_blender;
-	std::set<CK_ID>* matList;
+	std::set<CK_ID>* matList,* txurList;
 	ExportConfig* cfg;
 	CKContext* ctx;
 };

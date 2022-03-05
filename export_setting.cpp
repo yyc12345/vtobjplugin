@@ -1,9 +1,6 @@
 ﻿#include "stdafx.h"
 #include "export_setting.h"
-#include "buffer_helper.h"
 #include "config_manager.h"
-
-#pragma warning(disable:26812)
 
 IMPLEMENT_DYNAMIC(ExportSetting, CDialogEx)
 

@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "vt_menu.h"
 #include "obj_export.h"
-#include "buffer_helper.h"
 
 PluginInterface* s_Plugininterface = NULL;
 PluginInfo g_PluginInfo0;
@@ -37,8 +36,6 @@ BOOL SuperScriptMaterializer::InitInstance() {
 	g_PluginInfo0.m_PluginType = (PluginInfo::PLUGIN_TYPE)(g_PluginInfo0.m_PluginType | PluginInfo::PTF_RECEIVENOTIFICATION);
 	g_PluginInfo0.m_PluginCallback = PluginCallback;
 
-	if (!buffer_helper::InitBuffer())
-		throw std::bad_alloc();
 	exporter = new obj_export();
 
 	return CWinApp::InitInstance();
@@ -48,7 +45,6 @@ int SuperScriptMaterializer::ExitInstance() {
 	// TODO: Add your specialized code here and/or call the base class
 
 	delete exporter;
-	buffer_helper::DisposeBuffer();
 
 	return CWinApp::ExitInstance();
 }

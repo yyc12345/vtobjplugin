@@ -56,14 +56,22 @@ namespace string_helper {
 		
 		// convert to WCHAR
 		wcount = MultiByteToWideChar(origCP, 0, orig->c_str(), -1, NULL, 0);
-		if (wcount <= 0) throw new std::logic_error("Invalid count in MultiByteToWideChar.");
+		if (wcount <= 0) {
+			// fail to conv, fallback
+			(*dest) = orig->c_str();
+			return;
+		}
 		wscache.reserve(wcount);
 		write_result = MultiByteToWideChar(origCP, 0, orig->c_str(), -1, wscache.data(), wcount);
 		if (write_result <= 0) throw new std::length_error("Invalid write_result in MultiByteToWideChar.");
 
 		//converter to CHAR
 		count = WideCharToMultiByte(destCP, 0, wscache.c_str(), -1, NULL, 0, NULL, NULL);
-		if (wcount <= 0) throw new std::logic_error("Invalid count in WideCharToMultiByte.");
+		if (count <= 0) {
+			// fail to conv, fallback
+			(*dest) = orig->c_str();
+			return;
+		}
 		dest->resize(count);
 		write_result = WideCharToMultiByte(destCP, 0, wscache.c_str(), -1, dest->data(), count, NULL, NULL);
 		if (write_result <= 0) throw new std::length_error("Invalid write_result in WideCharToMultiByte.");

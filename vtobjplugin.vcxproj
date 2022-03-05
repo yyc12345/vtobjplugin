@@ -196,7 +196,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="buffer_helper.h" />
     <ClInclude Include="config_manager.h" />
     <ClInclude Include="export_setting.h" />
     <ClInclude Include="obj_export.h" />
@@ -206,7 +205,6 @@
     <ClInclude Include="vt_menu.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="buffer_helper.cpp" />
     <ClCompile Include="config_manager.cpp" />
     <ClCompile Include="export_setting.cpp" />
     <ClCompile Include="main.cpp" />

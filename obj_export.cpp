@@ -1,5 +1,5 @@
 #include "obj_export.h"
-#include "buffer_helper.h"
+#include "string_helper.h"
 #include <filesystem>
 #include <exception>
 #pragma warning(disable:6387)
@@ -12,15 +12,18 @@ obj_export::obj_export() {
 	cfg = NULL;
 	ctx = NULL;
 	matList = new std::set<CK_ID>();
+	txurList = new std::set<CK_ID>();
 }
 obj_export::~obj_export() {
 	delete matList;
+	delete txurList;
 }
 
 void obj_export::Ready4Export(CKContext* ctx, ExportConfig* cfg) {
 	this->ctx = ctx;
 	this->cfg = cfg;
 	matList->clear();
+	txurList->clear();
 }
 void obj_export::ExportAllWarpper() {
 	XObjectPointerArray objArray = ctx->GetObjectListByType(CKCID_3DENTITY, TRUE);
@@ -34,7 +37,7 @@ void obj_export::ExportAllWarpper() {
 
 	for (int i = 0; i < count; i++) {
 		obj = (CK3dEntity*)objArray[i];
-		if (!JudgeValidObject(obj)) continue;	//judge whether it is a valid export object
+		if (!ValidateObjectLegal(obj)) continue;	//judge whether it is a valid export object
 
 		NextFile(&fObj, obj->GetName(), "obj");
 		ExportObject(obj, &storedV);
@@ -72,7 +75,7 @@ void obj_export::ExportGroupWarpper() {
 		obj = (CK3dEntity*)objArray[i];
 		if (!obj->IsInGroup(grp)) continue;
 
-		if (!JudgeValidObject(obj)) continue;	//judge whether it is a valid export object
+		if (!ValidateObjectLegal(obj)) continue;	//judge whether it is a valid export object
 		NextFile(&fObj, obj->GetName(), "obj");
 		ExportObject(obj, &storedV);
 		NextRepostion(obj);
@@ -97,7 +100,7 @@ void obj_export::ExportGroupWarpper() {
 void obj_export::ExportObjectWarpper() {
 	int storedV = 0;
 	CK3dEntity* obj = (CK3dEntity*)ctx->GetObjectA(cfg->selected_item);
-	if (!JudgeValidObject(obj)) return;	//judge whether it is a valid export object
+	if (!ValidateObjectLegal(obj)) return;	//judge whether it is a valid export object
 
 	//obj mtl
 	StartFile(&fObj, "obj");
@@ -129,6 +132,9 @@ void obj_export::StartReposition() {
 		frepos_3dsmax = fopen(filepath.string().c_str(), "w");
 		if (frepos_3dsmax == NULL) throw std::bad_alloc();
 
+		//write bom
+		::string_helper::write_utf8bom(frepos_3dsmax);
+
 		//write header
 		fputs("fn tryModify obj mat = (\n", frepos_3dsmax);
 		fputs("    try obj.transform = mat catch ()\n", frepos_3dsmax);
@@ -141,6 +147,7 @@ void obj_export::StartReposition() {
 		if (frepos_blender == NULL) throw std::bad_alloc();
 
 		//write header
+		fputs("# -*- coding: UTF-8 -*-\n", frepos_blender);
 		fputs("import bpy\n", frepos_blender);
 		fputs("from mathutils import Matrix\n", frepos_blender);
 		fputs("def tryModify(obj, mat):\n", frepos_blender);
@@ -151,13 +158,14 @@ void obj_export::StartReposition() {
 	}
 }
 void obj_export::NextRepostion(CK3dEntity* obj) {
+	std::string obj_name;
+
 	if (frepos_3dsmax != NULL) {
-		//todo: finish 3ds max repostion export
 		VxMatrix cacheMat = obj->GetWorldMatrix();
-		GenerateObjName(obj, buffer_helper::misc_buffer);
-		ObjectNameUniform(buffer_helper::misc_buffer);
+		GenerateObjName(obj, cfg->use_utf8_script, &obj_name);
+		ObjectNameUniform(&obj_name);
 		fprintf(frepos_3dsmax, "tryModify $%s (matrix3 [%f, %f, %f] [%f, %f, %f] [%f, %f, %f] [%f, %f, %f])\n",
-			buffer_helper::misc_buffer,
+			obj_name.c_str(),
 			cacheMat[0][0], cacheMat[0][2], cacheMat[0][1],
 			cacheMat[2][0], cacheMat[2][2], cacheMat[2][1],
 			cacheMat[1][0], cacheMat[1][2], cacheMat[1][1],
@@ -165,10 +173,10 @@ void obj_export::NextRepostion(CK3dEntity* obj) {
 	}
 	if (frepos_blender != NULL) {
 		VxMatrix cacheMat = obj->GetWorldMatrix();
-		GenerateObjName(obj, buffer_helper::misc_buffer);
-		ObjectNameUniform(buffer_helper::misc_buffer);
+		GenerateObjName(obj, cfg->use_utf8_script, &obj_name);
+		ObjectNameUniform(&obj_name);
 		fprintf(frepos_blender, "tryModify('%s', Matrix(((%f, %f, %f, %f), (%f, %f, %f, %f), (%f, %f, %f, %f), (%f, %f, %f, %f))))\n",
-			buffer_helper::misc_buffer,
+			obj_name.c_str(),
 			cacheMat[0][0], cacheMat[0][2], cacheMat[0][1], cacheMat[0][3],
 			cacheMat[2][0], cacheMat[2][2], cacheMat[2][1], cacheMat[2][3],
 			cacheMat[1][0], cacheMat[1][2], cacheMat[1][1], cacheMat[1][3],
@@ -191,8 +199,9 @@ void obj_export::StartFile(FILE** fs, char* suffix) {
 	if (cfg->file_mode == FILEMODE_ONEFILE) {
 		if (*fs == NULL) {
 			std::filesystem::path fp(cfg->export_folder);
-			sprintf(buffer_helper::misc_buffer, "all.%s", suffix);
-			fp /= buffer_helper::misc_buffer;
+			std::string filename;
+			::string_helper::stdstring_sprintf(&filename, "all.%s", suffix);
+			fp /= filename.c_str();
 
 			*fs = fopen(fp.string().c_str(), "w");
 			if (*fs == NULL) throw std::bad_alloc();
@@ -206,10 +215,10 @@ void obj_export::NextFile(FILE** fs, char* name, char* suffix) {
 
 		//open new file
 		std::filesystem::path fp(cfg->export_folder);
-		strcpy(buffer_helper::misc_buffer, name);
-		FileNameUniform(buffer_helper::misc_buffer);
-		sprintf(buffer_helper::misc_buffer2, "%s.%s", buffer_helper::misc_buffer, suffix);
-		fp /= buffer_helper::misc_buffer2;
+		std::string filename;
+		::string_helper::stdstring_sprintf(&filename, "%s.%s", name, suffix);
+		FileNameUniform(&filename);
+		fp /= filename.c_str();
 
 		*fs = fopen(fp.string().c_str(), "w");
 		if (*fs == NULL) throw std::bad_alloc();
@@ -228,17 +237,20 @@ void obj_export::ExportObject(CK3dEntity* obj, int* storedV) {
 	int voffset = *storedV;
 	CKMesh* mesh = obj->GetCurrentMesh();
 	int count = mesh->GetVertexCount();
+	std::string obj_name;
 	(*storedV) += count;
 
 	//mtllib
 	if (voffset == 0) {
 		//the first obj, add mtllib
+		std::string mtllib_name;
 		if (cfg->file_mode == FILEMODE_MULTIFILE) {
-			strcpy(buffer_helper::export_buffer, obj->GetName());
-			FileNameUniform(buffer_helper::export_buffer);
-		} else strcpy(buffer_helper::export_buffer, "all");
+			GenerateObjName(obj, FALSE, &mtllib_name);
+			FileNameUniform(&mtllib_name);
+		} else mtllib_name = "all";
+
 		if (cfg->export_mtl)
-			fprintf(fObj, "mtllib %s.mtl\n", buffer_helper::export_buffer);
+			fprintf(fObj, "mtllib %s.mtl\n", mtllib_name.c_str());
 	}
 
 #define righthand_pos_converter(condition,y,z) (condition ? z : y), (condition ? y : z)
@@ -270,10 +282,13 @@ void obj_export::ExportObject(CK3dEntity* obj, int* storedV) {
 		fprintf(fObj, "vn %f %f %f\n", cacheVec1.x, righthand_pos_converter(cfg->right_hand, cacheVec1.y, cacheVec1.z));
 	}
 
-	//g
-	GenerateObjName(obj, buffer_helper::export_buffer);
-	ObjectNameUniform(buffer_helper::export_buffer);
-	fprintf(fObj, "g %s\n", buffer_helper::export_buffer);
+	//g or o
+	GenerateObjName(obj, cfg->use_utf8_obj, &obj_name);
+	ObjectNameUniform(&obj_name);
+	if (cfg->use_group_split_object)
+		fprintf(fObj, "g %s\n", obj_name.c_str());
+	else
+		fprintf(fObj, "o %s\n", obj_name.c_str());
 
 	//f and usemtl
 	count = mesh->GetFaceCount();
@@ -290,9 +305,9 @@ void obj_export::ExportObject(CK3dEntity* obj, int* storedV) {
 			CKMaterial* fmtl = mesh->GetFaceMaterial(i);
 			if (fmtl != NULL) {
 				matList->insert(fmtl->GetID());
-				GenerateMtlName(fmtl, buffer_helper::export_buffer);
-				ObjectNameUniform(buffer_helper::export_buffer);
-				fprintf(fObj, "usemtl %s\n", buffer_helper::export_buffer);
+				GenerateMtlName(fmtl, cfg->use_utf8_obj, &obj_name);
+				ObjectNameUniform(&obj_name);
+				fprintf(fObj, "usemtl %s\n", obj_name.c_str());
 			} else fputs("usemtl off\n", fObj);
 		}
 
@@ -326,10 +341,13 @@ void obj_export::ExportMaterial() {
 	matList->clear();
 }
 void obj_export::ExportMaterial(CKMaterial* mtl) {
+	std::string mat_name;
+	std::string filesystem_filename, fileinternal_filename;
+
 	//basic
-	GenerateMtlName(mtl, buffer_helper::export_buffer);
-	ObjectNameUniform(buffer_helper::export_buffer);
-	fprintf(fMtl, "newmtl %s\n", buffer_helper::export_buffer);
+	GenerateMtlName(mtl, cfg->use_utf8_obj, &mat_name);
+	ObjectNameUniform(&mat_name);
+	fprintf(fMtl, "newmtl %s\n", mat_name.c_str());
 	VxColor col = mtl->GetAmbient();
 	fprintf(fMtl, "Ka %f %f %f\n", col.r, col.g, col.b);
 	col = mtl->GetDiffuse();
@@ -344,40 +362,62 @@ void obj_export::ExportMaterial(CKMaterial* mtl) {
 	if (texture == NULL) return;
 	if (texture->GetSlotFileName(0) == NULL) return;
 
-	if (cfg->custom_texture_format) GenerateTextureName(texture, buffer_helper::export_buffer, cfg->texture_format.c_str());
-	else GenerateTextureName(texture, buffer_helper::export_buffer, NULL);
-
-	fprintf(fMtl, "map_Kd %s\n", buffer_helper::export_buffer);
+	GenerateTextureName(texture, cfg->use_utf8_obj, &fileinternal_filename);
+	fprintf(fMtl, "map_Kd %s\n", fileinternal_filename.c_str());
 
 	//export texture
 	if (!cfg->copy_texture) return;
+	if (txurList->find(texture->GetID()) != txurList->end()) return;	// existed item, file has been copied, skip
+	txurList->insert(texture->GetID());	// otherwise ass it in set
+
+	if (cfg->use_utf8_obj) {
+		// filesystem is not same with internal file string, re-generate it
+		GenerateTextureName(texture, FALSE, &filesystem_filename);
+	} else {
+		// same with internal file string, cpy directly
+		filesystem_filename = fileinternal_filename.c_str();
+	}
 	std::filesystem::path fp(cfg->export_folder);
-	fp /= buffer_helper::export_buffer;
-	strcpy(buffer_helper::export_buffer, fp.string().c_str());
-	texture->SaveImage(buffer_helper::export_buffer, 0, FALSE);
+	fp /= filesystem_filename.c_str();
+	texture->SaveImage((CKSTRING)fp.string().c_str(), 0, FALSE);
 
 }
 
 
-BOOL obj_export::JudgeValidObject(CK3dEntity* obj) {
+BOOL obj_export::ValidateObjectLegal(CK3dEntity* obj) {
 	CKMesh* mesh = obj->GetCurrentMesh();
 	if (mesh == NULL) return FALSE;					//no mesh
 	if (mesh->GetFaceCount() == 0) return FALSE;	//mo face
 	return TRUE;
 }
-void obj_export::GenerateObjName(CK3dEntity* obj, char* name) {
+void obj_export::GenerateObjName(CK3dEntity* obj, BOOL as_utf8, std::string* name) {
+	std::string naked_name, conv_name;
+
+	naked_name = (obj->GetName() == NULL ? "noname_3d_object" : obj->GetName());
+	if (as_utf8) {
+		::string_helper::encoding_conv(&naked_name, &conv_name, cfg->composition_encoding, CP_UTF8);
+	}
+
 	if (cfg->name_prefix)
-		sprintf(name, "obj%d_%s", obj->GetID(), obj->GetName() == NULL ? "noname_3d_object" : obj->GetName());
+		::string_helper::stdstring_sprintf(name, "obj%d_%s", obj->GetID(), conv_name.c_str());
 	else
-		strcpy(name, obj->GetName());
+		(*name) = conv_name.c_str();
 }
-void obj_export::GenerateMtlName(CKMaterial* obj, char* name) {
+void obj_export::GenerateMtlName(CKMaterial* obj, BOOL as_utf8, std::string* name) {
+	std::string naked_name, conv_name;
+
+	naked_name = (obj->GetName() == NULL ? "noname_material" : obj->GetName());
+	if (as_utf8) {
+		::string_helper::encoding_conv(&naked_name, &conv_name, cfg->composition_encoding, CP_UTF8);
+	}
+
 	if (cfg->name_prefix)
-		sprintf(name, "mtl%d_%s", obj->GetID(), obj->GetName() == NULL ? "noname_material" : obj->GetName());
+		::string_helper::stdstring_sprintf(name, "mtl%d_%s", obj->GetID(), conv_name.c_str());
 	else
-		strcpy(name, obj->GetName());
+		(*name) = conv_name.c_str();
+
 }
-void obj_export::GenerateTextureName(CKTexture* obj, char* name, const char* suffix) {
+void obj_export::GenerateTextureName(CKTexture* obj, BOOL as_utf8, std::string* name) {
 	std::string file;
 	std::filesystem::path filepath;
 
@@ -387,38 +427,52 @@ void obj_export::GenerateTextureName(CKTexture* obj, char* name, const char* suf
 		file = filepath.filename().string();
 	}
 
-	if (suffix != NULL) {
+	// suffix process
+	if (cfg->custom_texture_format) {
 		file.append(".");
-		file.append(suffix);
+		file.append(cfg->texture_format.c_str());
 	}
-	strcpy(name, file.c_str());
+
+	(*name) = file.c_str();
 }
-void obj_export::ObjectNameUniform(char* str) {
-	int len = strlen(str);
-	for (int i = 0; i < len; i++) {
-		if (str[i] == ' ' || //obj ban
-			str[i] == '\'' || //blender ban
-			str[i] == '$' || //3dsmax ban
-			str[i] == '.' ||
-			str[i] == '"') //my own ban
-			str[i] = '_';
+void obj_export::ObjectNameUniform(std::string* str) {
+	for (auto it = str->begin(); it != str->end(); it++) {
+		if (*it == '\0') break;
+
+		// check eliminate non-ascii
+		if (cfg->eliminate_non_ascii && ((*it) | 0b10000000)) {
+			*it = '_';
+		}
+
+		if (*it == ' ' || //obj ban
+			*it == '\'' || //blender ban
+			*it == '$' || //3dsmax ban
+			*it == '.' ||
+			*it == '"') //my own ban
+			*it = '_';
 	}
 }
-void obj_export::FileNameUniform(char* str) {
-	int len = strlen(str);
-	for (int i = 0; i < len; i++) {
-		if (str[i] == ' ' || //sync with object uniform
-			str[i] == '\'' ||
-			str[i] == '$' ||
-			str[i] == '.' ||
-			str[i] == '\\' || //file system ban
-			str[i] == '/' ||
-			str[i] == '*' ||
-			str[i] == '?' ||
-			str[i] == '"' ||
-			str[i] == '<' ||
-			str[i] == '>' ||
-			str[i] == '|')
-			str[i] = '_';
+void obj_export::FileNameUniform(std::string* str) {
+	for (auto it = str->begin(); it != str->end(); it++) {
+		if (*it == '\0') break;
+
+		// check eliminate non-ascii
+		if (cfg->eliminate_non_ascii && ((*it) | 0b10000000)) {
+			*it = '_';
+		}
+
+		if (*it == ' ' || //sync with object uniform
+			*it == '\'' ||
+			*it == '$' ||
+			*it == '.' ||
+			*it == '\\' || //file system ban
+			*it == '/' ||
+			*it == '*' ||
+			*it == '?' ||
+			*it == '"' ||
+			*it == '<' ||
+			*it == '>' ||
+			*it == '|')
+			*it = '_';
 	}
 }
