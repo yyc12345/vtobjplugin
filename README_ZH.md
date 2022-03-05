@@ -62,9 +62,29 @@ Virtools Obj 插件
 * Copy texture file：将导出材质复制到输出目录，如果你已有材质文件列表，可以关闭此选项以节省空间和不必要的IO操作。
 * Custom texture map format：自定义材质格式。目前由于SDK限制无法读取原有材质格式，如果不勾选并填入后缀那么保存的材质将不具有任何后缀名，这可能会在Windows 10以前的操作系统上引发错误。
 
+## 导出提示
+
+由于导出选项比较复杂，并且导出的模型主要用于3ds Max以及Blender内的导入，因此在此处分别介绍适用于两个软件的导出设置。此处的设置是基于对默认设置（即第一次使用此插件时的设置）的修改，如果没有陈述，则保持默认设置。
+
+### Blender
+
+* 勾选Use UTF8 in object file
+* 勾选Use UTF8 in script file
+* 勾选Generate Blender script
+
+> Blender本身和Blender的obj导出插件默认物体文件和脚本文件是以UTF8进行呈现的。因此需要以UTF8模式输出文本，同时不需要消除非ASCII字符，因为Blender可以正确处理这些字符。
+
+### 3ds Max
+
+* 勾选Use UTF8 in script file
+* 勾选Eliminate non-ASCII characters
+* 勾选Generate 3ds Max script
+
+> 3ds Max的默认Obj导入器不能识别非ASCII字符，会将其转换为下划线。所以导致生成的脚本和模型文件名内部物体的名称不匹配，进而在执行脚本时出错。因此我们需要在导出时就消除非ASCII字符。同时旧版本的3ds Max的脚本执行器只能识别带有BOM的UTF8文档并正确显示多语言文本，因此需要使用UTF8输出脚本文件。
+
 ## 导入提示
 
-此处就Blender和3ds Max导入做一些提示。此处的设置是以对默认设置（即第一次使用此插件时的设置）为前提进行讲述的
+此处就Blender和3ds Max导入做一些提示。此处的设置是以对默认设置（即按照上述导出提示使用此插件时的设置）为前提进行讲述的
 
 ### Blender
 
@@ -89,11 +109,3 @@ Virtools Obj 插件
 项目编译配置中指定了很多绝对路径，初见者难以修改。
 
 强烈不建议您自行编译，除非您对Virtools非常了解。
-
-## 开发计划
-
-当前版本 v1.6，以下内容将在未来版本中加入。
-
-* 支持选择使用`g`（group）还是`o`（object）来构建物体
-* 对于tga贴图透明通道的导出
-* 消除共用贴图每次引用都需要重新导出到目标文件夹，减少IO操作
