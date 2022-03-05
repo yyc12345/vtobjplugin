@@ -8,6 +8,31 @@ namespace string_helper {
 		fputs("\xef\xbb\xbf", fs);
 	}
 
+	BOOL check_cp_validation(UINT cp) {
+		CPINFOEXA cpinfo;
+		return GetCPInfoExA(cp, 0, &cpinfo);
+	}
+
+	BOOL stdstring_to_uint(std::string* strl, UINT* number) {
+		return (sscanf(strl->c_str(), "%u", number) > 0);
+	}
+
+	void uint_to_stdstring(std::string* strl, UINT number) {
+		stdstring_sprintf(strl, "%u", number);
+	}
+
+	void cwndtext_to_stdstring(CWnd* ctrl, std::string* strl) {
+		int count = ctrl->GetWindowTextLengthA();
+		if (count == 0) {
+			strl->clear();
+			return;
+		}
+
+		count++;
+		strl->resize(count);
+		ctrl->GetWindowTextA(strl->data(), count);
+	}
+
 	void stdstring_sprintf(std::string* strl, const char* format, ...) {
 		va_list argptr;
 		va_start(argptr, format);

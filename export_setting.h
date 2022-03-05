@@ -5,6 +5,7 @@
 #include <afxdialogex.h>
 #include <vector>
 #include "obj_export.h"
+#include "string_helper.h"
 // ExportSetting 对话框
 
 class ExportSetting : public CDialogEx {

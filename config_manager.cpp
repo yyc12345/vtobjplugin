@@ -73,7 +73,7 @@ needInitCfg:
 	cfg->right_hand = TRUE;
 	cfg->name_prefix = FALSE;
 	cfg->use_group_split_object = TRUE;
-	cfg->use_group_split_object = FALSE;
+	cfg->eliminate_non_ascii = FALSE;
 	cfg->reposition_3dsmax = FALSE;
 	cfg->reposition_blender = FALSE;
 	cfg->export_mtl = TRUE;

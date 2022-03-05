@@ -89,6 +89,7 @@ END_MESSAGE_MAP()
 BOOL ExportSetting::OnInitDialog() {
 	CDialogEx::OnInitDialog();
 
+	std::string uint_cache;
 	config_manager::LoadConfig(&res_settings);
 	switch (res_settings.export_mode) {
 		case EXPORTMODE_OBJECT:
@@ -135,6 +136,8 @@ BOOL ExportSetting::OnInitDialog() {
 	} else {
 		m_EncodingType_System.SetCheck(1);
 	}
+	::string_helper::uint_to_stdstring(&uint_cache, res_settings.composition_encoding);
+	m_CustomEncoding.SetWindowTextA(uint_cache.c_str());
 	m_Encoding_UTF8Object.SetCheck(res_settings.use_utf8_obj);
 	m_Encoding_UTF8Script.SetCheck(res_settings.use_utf8_script);
 
@@ -152,26 +155,30 @@ BOOL ExportSetting::OnInitDialog() {
 #pragma region core func
 
 void ExportSetting::func_ExportFolderBroswer() {
+	std::string display_name(MAX_PATH, '\0');
+
 	BROWSEINFOA folderViewer = { 0 };
 	folderViewer.hwndOwner = m_hWnd;
 	folderViewer.pidlRoot = NULL;
-	folderViewer.pszDisplayName = buffer_helper::global_buffer;
+	folderViewer.pszDisplayName = display_name.data();
 	folderViewer.lpszTitle = "Pick a folder";
 	folderViewer.lpfn = NULL;
 	folderViewer.ulFlags = BIF_RETURNONLYFSDIRS | BIF_USENEWUI;
 	PIDLIST_ABSOLUTE data = SHBrowseForFolder(&folderViewer);
 	if (data == NULL) return;
-	if (SHGetPathFromIDList(data, buffer_helper::global_buffer))
-		m_ExportFolder.SetWindowTextA(buffer_helper::global_buffer);
+	if (SHGetPathFromIDListA(data, display_name.data()))
+		m_ExportFolder.SetWindowTextA(display_name.c_str());
 	CoTaskMemFree(data);
 }
 
 void ExportSetting::func_DialogOK() {
 
 	//general setting
+	res_settings.use_group_split_object = m_SplitMode_Group.GetCheck();
 	res_settings.omit_transform = m_OmitTransform.GetCheck();
 	res_settings.right_hand = m_RightHand.GetCheck();
 	res_settings.name_prefix = m_NamePrefix.GetCheck();
+	res_settings.eliminate_non_ascii = m_EliminateNonAscii.GetCheck();
 
 	res_settings.reposition_3dsmax = m_Reposition_3dsmax.GetCheck();
 	res_settings.reposition_blender = m_Reposition_Blender.GetCheck();
@@ -180,8 +187,10 @@ void ExportSetting::func_DialogOK() {
 	res_settings.export_texture = m_ExportTexture.GetCheck();
 	res_settings.copy_texture = m_CopyTexture.GetCheck();
 	res_settings.custom_texture_format = m_CustomTextureFormat.GetCheck();
-	m_TextureFormat.GetWindowTextA(buffer_helper::global_buffer, BUFFER_SIZE);
-	res_settings.texture_format = buffer_helper::global_buffer;
+	::string_helper::cwndtext_to_stdstring(&m_TextureFormat, &res_settings.texture_format);
+
+	res_settings.use_utf8_obj = m_Encoding_UTF8Object.GetCheck();
+	res_settings.use_utf8_script = m_Encoding_UTF8Script.GetCheck();
 
 	//file mode apply
 	if (m_FileMode_All.GetCheck()) res_settings.file_mode = FILEMODE_ONEFILE;
@@ -203,8 +212,7 @@ void ExportSetting::func_DialogOK() {
 	}
 
 	//export folder check
-	m_ExportFolder.GetWindowTextA(buffer_helper::global_buffer, BUFFER_SIZE);
-	res_settings.export_folder = buffer_helper::global_buffer;
+	::string_helper::cwndtext_to_stdstring(&m_ExportFolder, &res_settings.export_folder);
 	if (res_settings.export_folder.empty()) {
 		MessageBoxA("Export folder should not be empty.", "Setting error", MB_OK + MB_ICONERROR);
 		return;
@@ -221,6 +229,22 @@ void ExportSetting::func_DialogOK() {
 	if (res_settings.export_mtl && res_settings.export_texture && res_settings.custom_texture_format && res_settings.texture_format.empty()) {
 		MessageBoxA("Texture format should not be empty.", "Setting error", MB_OK + MB_ICONERROR);
 		return;
+	}
+
+	// composition encoding check
+	if (m_EncodingType_System.GetCheck() == 1) {
+		res_settings.use_custom_encoding = FALSE;
+	} else {
+		res_settings.use_custom_encoding = TRUE;
+
+		std::string encoding_cp;
+		::string_helper::cwndtext_to_stdstring(&m_CustomEncoding, &encoding_cp);
+		if (encoding_cp.empty() ||
+			!(::string_helper::stdstring_to_uint(&encoding_cp, &res_settings.composition_encoding)) ||
+			!(::string_helper::check_cp_validation(res_settings.composition_encoding))) {
+			MessageBoxA("Custom encoding is invalid.", "Setting error", MB_OK + MB_ICONERROR);
+			return;
+		}
 	}
 
 	//check pass. save current config and exit
@@ -245,17 +269,18 @@ void ExportSetting::func_ChangeExportMode() {
 	//change mode
 	m_ExportList.ResetContent();
 	comboboxMirror.clear();
+	std::string noname_obj;
 	int count = 0;
 	if (m_ExportMode_Object.GetCheck() == 1) {
 		XObjectPointerArray objArray = context->GetObjectListByType(CKCID_3DENTITY, TRUE);
 		count = objArray.Size();
 		for (int i = 0; i < count; i++) {
 			comboboxMirror.push_back(objArray[i]->GetID());
-			if (objArray[i]->GetName() != NULL) 
+			if (objArray[i]->GetName() != NULL)
 				m_ExportList.AddString(objArray[i]->GetName());
 			else {
-				sprintf(buffer_helper::global_buffer, "[unnamed 3d object] (CKID: %d)", objArray[i]->GetID());
-				m_ExportList.AddString(buffer_helper::global_buffer);
+				::string_helper::stdstring_sprintf(&noname_obj, "[unnamed 3d object] (CKID: %d)", objArray[i]->GetID());
+				m_ExportList.AddString(noname_obj.c_str());
 			}
 		}
 	} else if (m_ExportMode_Group.GetCheck() == 1) {
@@ -267,8 +292,8 @@ void ExportSetting::func_ChangeExportMode() {
 			if (context->GetObjectA(idList[i])->GetName() != NULL)
 				m_ExportList.AddString(context->GetObjectA(idList[i])->GetName());
 			else {
-				sprintf(buffer_helper::global_buffer, "[unnamed group] (CKID: %d)", idList[i]);
-				m_ExportList.AddString(buffer_helper::global_buffer);
+				::string_helper::stdstring_sprintf(&noname_obj, "[unnamed group] (CKID: %d)", idList[i]);
+				m_ExportList.AddString(noname_obj.c_str());
 			}
 		}
 	}
