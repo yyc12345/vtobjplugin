@@ -13,8 +13,11 @@ namespace string_helper {
 	void uint_to_stdstring(std::string* strl, UINT number);
 	void cwndtext_to_stdstring(CWnd* ctrl, std::string* strl);
 	void stdstring_sprintf(std::string* strl, const char* format, ...);
-	void encoding_conv(std::string* orig, std::string* dest, UINT origCP, UINT destCP);
+	void stdwstring_sprintf(std::wstring* strl, const wchar_t* format, ...);
 
+	void encoding_conv(std::string* orig, std::string* dest, UINT origCP, UINT destCP);
+	BOOL conv_string2wstring(std::string* orig, std::wstring* dest, UINT cp);
+	BOOL conv_wstring2string(std::wstring* orig, std::string* dest, UINT cp);
 }
 
 #endif

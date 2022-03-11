@@ -61,20 +61,27 @@ class obj_export {
 	void NextRepostion(CK3dEntity* obj);
 	void EndRepostition();
 
-	void StartFile(FILE** fs, char* suffix);
-	void NextFile(FILE** fs, char* name, char* suffix);
+	void StartFile(FILE** fs, BOOL is_obj);
+	void NextFile(FILE** fs, CKObject* obj, BOOL is_obj);
 	void EndFile(FILE** fs);
 
 	void ExportObject(CK3dEntity* obj, int* storedV);
 	void ExportMaterial();
 	void ExportMaterial(CKMaterial* mtl);
 
+
 	BOOL ValidateObjectLegal(CK3dEntity* obj);
-	void GenerateObjName(CK3dEntity* obj, BOOL as_utf8, std::string* name);
-	void GenerateMtlName(CKMaterial* obj, BOOL as_utf8, std::string* name);
-	void GenerateTextureName(CKTexture* obj, BOOL as_utf8, std::string* name);
-	void ObjectNameUniform(std::string* str);
-	void FileNameUniform(std::string* str);
+
+	void GenerateCKObjectName(CKObject* obj, std::string* name);
+	void GenerateObjMtlName(CKObject* obj, std::string* name, BOOL in_script);
+	FILE* OpenObjMtlFile(CKObject* obj, BOOL is_obj);
+
+	void GenerateTextureFilename(CKTexture* obj, std::wstring* name);
+	void GenerateTextureFilenameInFile(CKTexture* obj, std::string* name);
+	void CopyTextureFile(CKTexture* texture);
+
+	void RegulateName(std::string* str);
+	void RegulateName(std::wstring* str);
 
 	FILE* fObj;
 	FILE* fMtl;
