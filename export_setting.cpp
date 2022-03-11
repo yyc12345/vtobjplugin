@@ -110,9 +110,9 @@ BOOL ExportSetting::OnInitDialog() {
 	m_ExportFolder.SetWindowTextA(res_settings.export_folder.c_str());
 
 	if (res_settings.use_group_split_object) {
-		m_SplitMode_Object.SetCheck(1);
-	} else {
 		m_SplitMode_Group.SetCheck(1);
+	} else {
+		m_SplitMode_Object.SetCheck(1);
 	}
 	m_OmitTransform.SetCheck(res_settings.omit_transform);
 	m_RightHand.SetCheck(res_settings.right_hand);

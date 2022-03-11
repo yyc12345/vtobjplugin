@@ -68,7 +68,11 @@ namespace string_helper {
 	void encoding_conv(std::string* orig, std::string* dest, UINT origCP, UINT destCP) {
 		std::wstring wscache;
 
-		if (origCP == destCP) return;
+		if (origCP == destCP) {
+			// do not need any convertion
+			(*dest) = orig->c_str();
+			return;
+		}
 
 		if (!conv_string2wstring(orig, &wscache, origCP)) {
 			// fail to conv, fallback

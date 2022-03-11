@@ -18,6 +18,16 @@ enum FileMode {
 	FILEMODE_MULTIFILE	//one file per object
 };
 
+enum WrittenFileType {
+	WRITTENFILETYPE_OBJMTL,	// write obj/mtl file
+	WRITTENFILETYPE_SCRIPT	// write script file
+};
+
+enum ModelFileType {
+	MODELFILETYPE_OBJ,
+	MODELFILETYPE_MTL
+};
+
 typedef struct {
 	ExportMode export_mode;
 	CK_ID selected_item;
@@ -61,8 +71,8 @@ class obj_export {
 	void NextRepostion(CK3dEntity* obj);
 	void EndRepostition();
 
-	void StartFile(FILE** fs, BOOL is_obj);
-	void NextFile(FILE** fs, CKObject* obj, BOOL is_obj);
+	void StartFile(FILE** fs, ModelFileType target_fs);
+	void NextFile(FILE** fs, CKObject* obj, ModelFileType target_fs);
 	void EndFile(FILE** fs);
 
 	void ExportObject(CK3dEntity* obj, int* storedV);
@@ -72,16 +82,17 @@ class obj_export {
 
 	BOOL ValidateObjectLegal(CK3dEntity* obj);
 
-	void GenerateCKObjectName(CKObject* obj, std::string* name);
-	void GenerateObjMtlName(CKObject* obj, std::string* name, BOOL in_script);
-	FILE* OpenObjMtlFile(CKObject* obj, BOOL is_obj);
+	void GenCKObjectName(CKObject* obj, std::string* name);
+	void GenObjMtlName(CKObject* obj, std::string* name, WrittenFileType target_fs);
+	FILE* OpenObjMtlFile(CKObject* obj, ModelFileType target_fs);
 
-	void GenerateTextureFilename(CKTexture* obj, std::wstring* name);
-	void GenerateTextureFilenameInFile(CKTexture* obj, std::string* name);
+	void GenCKTextureName(CKTexture* obj, std::wstring* name);
+	void GenCKTextureName4File(CKTexture* obj, std::string* name);
 	void CopyTextureFile(CKTexture* texture);
 
 	void RegulateName(std::string* str);
-	void RegulateName(std::wstring* str);
+	void RegulateTextureFilename(std::string* str);
+	void RegulateTextureFilename(std::wstring* str);
 
 	FILE* fObj;
 	FILE* fMtl;
