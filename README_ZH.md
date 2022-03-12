@@ -22,7 +22,6 @@ Virtools Obj 插件
 ### 缺点
 
 * 左右手翻转只能支持YZ轴翻转。
-* 使用组来分割物体，并且不提供任何其他选项修改。
 * 平滑组没有考虑。
 * 只能导出3D物体，不能导出线等二维结构
 
@@ -31,7 +30,7 @@ Virtools Obj 插件
 1. 将插件安装到Virtools的`InterfacePlugins`文件夹中。
 1. 启动Virtools，加载需要导出的文档。
 1. 根据需要，考虑是否需要做额外操作，比如只想导出路面或者某些物体，需要把相关物体归到一个新组中，或者不做任何操作，例如导出单个物体或全部物体。
-1. 点击菜单栏Vtobj-Export object。
+1. 点击菜单栏Vtobj - Export object。
 1. 弹出窗口中配置好各类参数，点击OK即可导出
 
 ## 导出选项解释
@@ -44,13 +43,15 @@ Virtools Obj 插件
 
 ### Object Setting
 
+* Split object by: 决定是使用`g`（Group）语句还是`o`（Object）语句来划分物体。
 * Omit object transform data：忽略世界变换矩阵，建议勾选。此选项仅仅是为了提供向vt2obj兼容的功能而存在。
 * Convert to right-hand coordinate system：转为右手坐标系，特指Blender和3ds Max类型的右手坐标系。
 * Add name prefix：增加唯一的名称前缀以规避名称冲突。
+* Eliminate non-ASCII characters：消除文本中的所有非ASCII字符，在一些不能够正确处理编码的场合可能会有用。
 
 ### Reposition Script
 
-如果`Object Setting`中前两项中的任意一项不勾选，那么下述两项将不可用。
+如果`Object Setting`中`Omit object transform data`和`Convert to right-hand coordinate system`中的任意一项不勾选，那么下述两项将不可用。
 
 * Generate 3ds Max script (3dsmax.ms)：生成3ds Max的重定位脚本
 * Generate Blender script (blender.py)：生成Blender的重定位脚本
@@ -62,12 +63,21 @@ Virtools Obj 插件
 * Copy texture file：将导出材质复制到输出目录，如果你已有材质文件列表，可以关闭此选项以节省空间和不必要的IO操作。
 * Custom texture map format：自定义材质格式。目前由于SDK限制无法读取原有材质格式，如果不勾选并填入后缀那么保存的材质将不具有任何后缀名，这可能会在Windows 10以前的操作系统上引发错误。
 
+### Encoding
+
+* Composition encoding
+  - System：使用系统的编码，选择此项即保持与1.x版本的导出器相同的行为。在文档没有出现乱码的情况下，也可以选择此项。
+  - Custom：给予用户一个让导出器正确读取物体名称的机会。Virtools使用依赖于系统的多字节编码。因此当Virtools文档的作者与阅读者（你）的系统编码不相同，且作者恰好在文档中使用了非ASCII字符，那么文档将会出现乱码。例如，Ballance使用西欧编码编码了`A01_Geländer_01`，那么在一些其它编码下则会出现乱码，此时若选择此项并填入`29591`（Windows代码页）则可以正确读取字符并输出正确的文件。
+* Use UTF8 in object file：在obj和mtl文件中使用UTF8编码，而不是本机编码。此项与下一项通常与自定义文档编码一起使用。
+* Use UTF8 in script file：在脚本文件中使用UTF8编码。
+
 ## 导出提示
 
 由于导出选项比较复杂，并且导出的模型主要用于3ds Max以及Blender内的导入，因此在此处分别介绍适用于两个软件的导出设置。此处的设置是基于对默认设置（即第一次使用此插件时的设置）的修改，如果没有陈述，则保持默认设置。
 
 ### Blender
 
+* 设置Composition encoding，如果需要
 * 勾选Use UTF8 in object file
 * 勾选Use UTF8 in script file
 * 勾选Generate Blender script
@@ -76,11 +86,12 @@ Virtools Obj 插件
 
 ### 3ds Max
 
+* 设置Composition encoding，如果需要
 * 勾选Use UTF8 in script file
 * 勾选Eliminate non-ASCII characters
 * 勾选Generate 3ds Max script
 
-> 3ds Max的默认Obj导入器不能识别非ASCII字符，会将其转换为下划线。所以导致生成的脚本和模型文件名内部物体的名称不匹配，进而在执行脚本时出错。因此我们需要在导出时就消除非ASCII字符。同时旧版本的3ds Max的脚本执行器只能识别带有BOM的UTF8文档并正确显示多语言文本，因此需要使用UTF8输出脚本文件。
+> 3ds Max的默认obj导入器不能识别非ASCII字符，会将其转换为下划线。所以导致生成的脚本和模型文件名内部物体的名称不匹配，进而在执行脚本时出错。因此我们需要在导出时就消除非ASCII字符。同时旧版本的3ds Max的脚本执行器只能识别带有BOM的UTF8文档并正确显示多语言文本，因此需要使用UTF8输出脚本文件。
 
 ## 导入提示
 
