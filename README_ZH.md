@@ -67,7 +67,7 @@ Virtools Obj 插件
 
 * Composition encoding
   - System：使用系统的编码，选择此项即保持与1.x版本的导出器相同的行为。在文档没有出现乱码的情况下，也可以选择此项。
-  - Custom：给予用户一个让导出器正确读取物体名称的机会。Virtools使用依赖于系统的多字节编码。因此当Virtools文档的作者与阅读者（你）的系统编码不相同，且作者恰好在文档中使用了非ASCII字符，那么文档将会出现乱码。例如，Ballance使用西欧编码编码了`A01_Geländer_01`，那么在一些其它编码下则会出现乱码，此时若选择此项并填入`29591`（Windows代码页）则可以正确读取字符并输出正确的文件。
+  - Custom：给予用户一个让导出器正确读取物体名称的机会。Virtools使用依赖于系统的多字节编码。因此当Virtools文档的作者与阅读者（你）的系统编码不相同，且作者恰好在文档中使用了非ASCII字符，那么文档将会出现乱码。例如，Ballance使用西欧编码编码了`A01_Geländer_01`，那么在一些其它编码下则会出现乱码，此时若选择此项并填入`28591`（[Windows代码页](https://docs.microsoft.com/en-us/windows/win32/intl/code-page-identifiers)）则可以正确读取字符并输出正确的文件。
 * Use UTF8 in object file：在obj和mtl文件中使用UTF8编码，而不是本机编码。此项与下一项通常与自定义文档编码一起使用。
 * Use UTF8 in script file：在脚本文件中使用UTF8编码。
 
