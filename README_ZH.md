@@ -73,7 +73,7 @@ Virtools Obj 插件
 
 ## 导出提示
 
-由于导出选项比较复杂，并且导出的模型主要用于3ds Max以及Blender内的导入，因此在此处分别介绍适用于两个软件的导出设置。此处的设置是基于对默认设置（即第一次使用此插件时的设置）的修改，如果没有陈述，则保持默认设置。
+由于导出选项的编码部分比较复杂，并且导出的模型主要用于3ds Max以及Blender内的导入，因此在此处分别介绍适用于两个软件的导出设置中的编码部分的设置。此处的设置是基于对默认设置（即第一次使用此插件时的设置）的修改，如果没有陈述，则保持默认设置。
 
 ### Blender
 
@@ -87,11 +87,13 @@ Virtools Obj 插件
 ### 3ds Max
 
 * 设置Composition encoding，如果需要
-* 勾选Use UTF8 in script file
+* Use UTF8 in script file，请根据情况勾选，详见之后的注释
 * 勾选Eliminate non-ASCII characters
 * 勾选Generate 3ds Max script
 
 > 3ds Max的默认obj导入器不能识别非ASCII字符，会将其转换为下划线。所以导致生成的脚本和模型文件名内部物体的名称不匹配，进而在执行脚本时出错。因此我们需要在导出时就消除非ASCII字符。同时旧版本的3ds Max的脚本执行器只能识别带有BOM的UTF8文档并正确显示多语言文本，因此需要使用UTF8输出脚本文件。
+
+> 3ds Max的两个MAXScript执行方法具有不同的文件读取策略。如果您想使用 MAXScript-运行脚本 执行脚本，那么您不可以勾选Use UTF8 in script file。如果您想使用先 MAXScript-打开脚本，然后在窗口中使用 工具-计算所有 来运行脚本，则可以勾选这个选项。
 
 ## 导入提示
 
@@ -111,7 +113,7 @@ Virtools Obj 插件
 * 法线从文件导入
 * 勾选导入材质
 
-重定位在菜单栏选择MAXScript-运行脚本，选择`3dsmax.ms`并执行即可
+重定位在菜单栏选择 MAXScript-运行脚本，选择`3dsmax.ms`并执行即可，或先 MAXScript-打开脚本，然后在窗口中使用 工具-计算所有。根据您之前在导出提示中做出的选择。
 
 ## 编译
 

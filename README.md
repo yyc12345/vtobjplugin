@@ -75,7 +75,7 @@ Repostion means that restore object's original move, rotation and scale.
 
 ## Export tips
 
-Since the export options are more complicated, and the exported models are mainly used for import in 3ds Max and Blender, the export settings applicable to the two softwares are introduced here. The settings here are based on the default settings (the initial settings when you first launch this plugin). Please keep default settings if the options are not written here.
+Since the export encoding options are more complicated, and the exported models are mainly used for import in 3ds Max and Blender, the export encoding settings applicable to the two softwares are introduced here. The settings here are based on the default settings (the initial settings when you first launch this plugin). Please keep default settings if the options are not written here.
 
 ### Blender
 
@@ -89,11 +89,13 @@ Since the export options are more complicated, and the exported models are mainl
 ### 3ds Max
 
 * Set Composition encoding, if needed
-* Check Use UTF8 in script file
+* Check Use UTF8 in script file according to your requirements. View following notes for more detail
 * Check Eliminate non-ASCII characters
 * Check Generate 3ds Max script
 
 > 3ds Max's default obj importer does not recognize non-ASCII characters and will converts them to `_`(underline). Therefore, the generated script does not match the name of the object inside the model file name, and an error occurs when executing the script. So we need to eliminate non-ASCII characters when exporting. At the same time, the MAXScript executor of the old version of 3ds Max can only recognize UTF8 documents with BOM. Any other files with different encoding will let script become garbled. So it needs to use UTF8 to output script files.
+
+> There are 2 different 3ds Max MAXScript executing strategy. If you want to use *MAXScript - Run script* to execute script, you should not check *Use UTF8 in script file*. However, if you want to use *MAXScript - Open script* to open script file first and use *Tools - Evaluate all* to execute script in opened window, you should check *Use UTF8 in script file*
 
 ## Import tips
 
@@ -113,7 +115,7 @@ For reposition, load script file `blender.py` in Scripting tab and run it.
 * For normals, select imported from file
 * Check import material
 
-For reposition, Click MAXScript-Run script in menu. Select `3dsmax.ms` and run it.
+For reposition, click *MAXScript-Run* script in menu. Select `3dsmax.ms` and run it, or, click *MAXScript - Open script* to open script file first and use *Tools - Evaluate all* to execute script in opened window. This is rely on your chosen solution said in Export Tips section.
 
 ## Build
 
