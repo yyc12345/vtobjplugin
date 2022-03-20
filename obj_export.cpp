@@ -375,7 +375,7 @@ BOOL obj_export::ValidateObjectLegal(CK3dEntity* obj) {
 	return TRUE;
 }
 
-void obj_export::GenCKObjectName(CKObject* obj, std::string* name) {
+void obj_export::GenCKObjectNameA(CKObject* obj, std::string* name) {
 	// this function will generate native CKObject name.
 	std::string native_name, full_name;
 
@@ -389,7 +389,7 @@ void obj_export::GenCKObjectName(CKObject* obj, std::string* name) {
 	// copy from virtools or generate default name
 	if (obj->GetName() != NULL) {
 		native_name = obj->GetName();
-		RegulateName(&native_name);
+		RegulateNameA(&native_name, TRUE);
 	} else {
 		::string_helper::stdstring_sprintf(&native_name, "noname_%d", obj->GetID());
 	}
@@ -401,16 +401,51 @@ void obj_export::GenCKObjectName(CKObject* obj, std::string* name) {
 		(*name) = native_name.c_str();
 }
 
+BOOL obj_export::GenCKObjectNameW(CKObject* obj, std::wstring* name) {
+	// same as GenCKObjectNameA
+	std::string native_name;
+	std::wstring conv_name, full_name;
+	if (obj == NULL) {
+		(*name) = L"all";
+		return;
+	}
+	if (obj->GetName() != NULL) {
+		native_name = obj->GetName();
+		if (!::string_helper::conv_string2wstring(
+			&native_name, &conv_name,
+			cfg->use_custom_encoding ? cfg->composition_encoding : CP_ACP)) {
+			// if conv failed, return FALSE
+			return FALSE;
+		}
+		RegulateNameW(&conv_name, TRUE);
+	} else {
+		::string_helper::stdwstring_sprintf(&conv_name, L"noname_%d", obj->GetID());
+	}
+	if (cfg->name_prefix)
+		::string_helper::stdwstring_sprintf(name, L"obj%d_%s", obj->GetID(), conv_name.c_str());
+	else
+		(*name) = conv_name.c_str();
+
+	return TRUE;
+}
+
 void obj_export::GenObjMtlName(CKObject* obj, std::string* name, WrittenFileType target_fs) {
 	// this function will generate CKObject name used in file body.
 	std::string name_cache;
-	GenCKObjectName(obj, &name_cache);
+	std::wstring wname_cache;
 
 	// conv encoding with fall back
-	::string_helper::encoding_conv(&name_cache, name,
-		cfg->use_custom_encoding ? cfg->composition_encoding : CP_ACP,
-		target_fs == WRITTENFILETYPE_SCRIPT ? (cfg->use_utf8_script ? CP_UTF8 : CP_ACP) :
-		(cfg->use_utf8_obj ? CP_UTF8 : CP_ACP));
+	if (GenCKObjectNameW(obj, &wname_cache)) {
+		// get wname success
+		if (!::string_helper::conv_wstring2string(&wname_cache, name,
+			target_fs == WRITTENFILETYPE_SCRIPT ? (cfg->use_utf8_script ? CP_UTF8 : CP_ACP) :
+			(cfg->use_utf8_obj ? CP_UTF8 : CP_ACP))) {
+			// if conv to local CP failed, use A function
+			GenCKObjectNameA(obj, name);
+		}
+	} else {
+		GenCKObjectNameA(obj, name);
+	}
 }
 
 FILE* obj_export::OpenObjMtlFile(CKObject* obj, ModelFileType target_fs) {
@@ -418,19 +453,17 @@ FILE* obj_export::OpenObjMtlFile(CKObject* obj, ModelFileType target_fs) {
 	// and execute it.
 	std::string mbname;
 	std::wstring wsname;
-	GenCKObjectName(obj, &mbname);
 
 	std::filesystem::path fp(cfg->export_folder.c_str());
-	if (::string_helper::conv_string2wstring(&mbname, &wsname,
-		cfg->use_custom_encoding ? cfg->composition_encoding : CP_ACP)) {
-
-		// conv successfully, use W function
+	if (GenCKObjectNameW(obj, &wsname)) {
+		// get successfully, use W function
 		fp /= wsname.c_str();
 		fp.replace_extension(target_fs == MODELFILETYPE_OBJ ? L".obj" : L".mtl");
 
 		return _wfopen(fp.wstring().c_str(), L"w");
 	} else {
-		// conv failed, use A function for falling back
+		// get failed, use A function for falling back
+		GenCKObjectNameA(obj, &mbname);
 		fp /= mbname.c_str();
 		fp.replace_extension(target_fs == MODELFILETYPE_OBJ ? ".obj" : ".mtl");
 
@@ -438,7 +471,7 @@ FILE* obj_export::OpenObjMtlFile(CKObject* obj, ModelFileType target_fs) {
 	}
 }
 
-void obj_export::GenCKTextureName(CKTexture* obj, std::wstring* name) {
+BOOL obj_export::GenCKTextureNameW(CKTexture* obj, std::wstring* name) {
 	// this function will generate CKObject name used in file body.
 	std::string native_file;
 	std::wstring wcfile;
@@ -454,7 +487,7 @@ void obj_export::GenCKTextureName(CKTexture* obj, std::wstring* name) {
 		filepath = wcfile.c_str();
 	} else {
 		// fall back. init path with string
-		filepath = native_file.c_str();
+		return FALSE;
 	}
 
 	// suffix process
@@ -464,26 +497,34 @@ void obj_export::GenCKTextureName(CKTexture* obj, std::wstring* name) {
 	}
 
 	(*name) = filepath.filename().wstring().c_str();
-	RegulateTextureFilename(name);
-}
+	RegulateNameW(name, FALSE);
 
+	return TRUE;
+}
+void obj_export::GenCKTextureNameA(CKTexture* obj, std::string* name) {
+	// same as GenCKTextureNameW
+	std::filesystem::path filepath;
+	filepath = obj->GetSlotFileName(0);
+
+	if (cfg->custom_texture_format) {
+		filepath += ".";
+		filepath += cfg->texture_format.c_str();
+	}
+	(*name) = filepath.filename().string().c_str();
+	RegulateNameA(name, FALSE);
+}
 void obj_export::GenCKTextureName4File(CKTexture* obj, std::string* name) {
 	std::wstring wscache;
-	GenCKTextureName(obj, &wscache);
 
-	if (!::string_helper::conv_wstring2string(&wscache, name,
-		cfg->use_utf8_obj ? CP_UTF8 : CP_ACP)) {
-
-		// failed. fall back to original name
-		std::filesystem::path filepath;
-		filepath = obj->GetSlotFileName(0);
-
-		if (cfg->custom_texture_format) {
-			filepath += ".";
-			filepath += cfg->texture_format.c_str();
+	if (GenCKTextureNameW(obj, &wscache)) {
+		// success
+		if (!::string_helper::conv_wstring2string(&wscache, name, cfg->use_utf8_obj ? CP_UTF8 : CP_ACP)) {
+			// if conv CP failed, use A function
+			GenCKTextureNameA(obj, name);
 		}
-		(*name) = filepath.filename().string().c_str();
-		RegulateTextureFilename(name);
+	} else {
+		// fail back
+		GenCKTextureNameA(obj, name);
 	}
 }
 
@@ -491,7 +532,7 @@ void obj_export::CopyTextureFile(CKTexture* texture) {
 	// get target file path
 	std::wstring wscache, system_temp;
 	std::filesystem::path fp(cfg->export_folder.c_str()), fpcache;
-	GenCKTextureName(texture, &wscache);
+	GenCKTextureNameW(texture, &wscache);
 	fp /= wscache.c_str();
 
 	// get cache file path
@@ -508,7 +549,7 @@ void obj_export::CopyTextureFile(CKTexture* texture) {
 
 }
 
-void obj_export::RegulateName(std::string* str) {
+void obj_export::RegulateNameA(std::string* str, BOOL eliminate4filebody) {
 	for (auto it = str->begin(); it != str->end(); it++) {
 		if (*it == '\0') break;
 
@@ -517,12 +558,18 @@ void obj_export::RegulateName(std::string* str) {
 			*it = '_';
 		}
 
+		if (eliminate4filebody) {
+			if (*it == '\'' || //blender ban
+				*it == '$' || //3dsmax ban
+				*it == '.') {
+				*it = '_';
+			}
+		}
+
 		if (*it == ' ' || //obj ban
-			*it == '\'' || //blender ban
-			*it == '$' || //3dsmax ban
-			*it == '.' ||
 			*it == '\\' || //file system ban
 			*it == '/' ||
+			*it == ':' ||
 			*it == '*' ||
 			*it == '?' ||
 			*it == '"' ||
@@ -532,32 +579,7 @@ void obj_export::RegulateName(std::string* str) {
 			*it = '_';
 	}
 }
-
-void obj_export::RegulateTextureFilename(std::string* str) {
-	for (auto it = str->begin(); it != str->end(); it++) {
-		if (*it == '\0') break;
-
-		// check eliminate non-ascii
-		if (cfg->eliminate_non_ascii && ((*it) & 0b10000000u)) {
-			*it = '_';
-		}
-
-		if (*it == ' ' || //obj ban
-			//*it == '\'' || //blender ban
-			//*it == '$' || //3dsmax ban
-			//*it == '.' ||
-			*it == '\\' || //file system ban
-			*it == '/' ||
-			*it == '*' ||
-			*it == '?' ||
-			*it == '"' ||
-			*it == '<' ||
-			*it == '>' ||
-			*it == '|')
-			*it = '_';
-	}
-}
-void obj_export::RegulateTextureFilename(std::wstring* str) {
+void obj_export::RegulateNameW(std::wstring* str, BOOL eliminate4filebody) {
 	for (auto it = str->begin(); it != str->end(); it++) {
 		if (*it == L'\0') break;
 
@@ -566,12 +588,18 @@ void obj_export::RegulateTextureFilename(std::wstring* str) {
 			*it = L'_';
 		}
 
+		if (eliminate4filebody) {
+			if (*it == L'\'' || //blender ban
+				*it == L'$' || //3dsmax ban
+				*it == L'.') {
+				*it = L'_';
+			}
+		}
+
 		if (*it == L' ' || //obj ban
-			//*it == L'\'' || //blender ban
-			//*it == L'$' || //3dsmax ban
-			//*it == L'.' ||
 			*it == L'\\' || //file system ban
 			*it == L'/' ||
+			*it == L':' ||
 			*it == L'*' ||
 			*it == L'?' ||
 			*it == L'"' ||
@@ -581,3 +609,4 @@ void obj_export::RegulateTextureFilename(std::wstring* str) {
 			*it = L'_';
 	}
 }
+

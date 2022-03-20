@@ -82,17 +82,18 @@ class obj_export {
 
 	BOOL ValidateObjectLegal(CK3dEntity* obj);
 
-	void GenCKObjectName(CKObject* obj, std::string* name);
+	BOOL GenCKObjectNameW(CKObject* obj, std::wstring* name);
+	void GenCKObjectNameA(CKObject* obj, std::string* name);
 	void GenObjMtlName(CKObject* obj, std::string* name, WrittenFileType target_fs);
 	FILE* OpenObjMtlFile(CKObject* obj, ModelFileType target_fs);
 
-	void GenCKTextureName(CKTexture* obj, std::wstring* name);
+	BOOL GenCKTextureNameW(CKTexture* obj, std::wstring* name);
+	void GenCKTextureNameA(CKTexture* obj, std::string* name);
 	void GenCKTextureName4File(CKTexture* obj, std::string* name);
 	void CopyTextureFile(CKTexture* texture);
 
-	void RegulateName(std::string* str);
-	void RegulateTextureFilename(std::string* str);
-	void RegulateTextureFilename(std::wstring* str);
+	void RegulateNameA(std::string* str, BOOL eliminate4filebody);
+	void RegulateNameW(std::wstring* str, BOOL eliminate4filebody);
 
 	FILE* fObj;
 	FILE* fMtl;
