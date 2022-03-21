@@ -407,7 +407,7 @@ BOOL obj_export::GenCKObjectNameW(CKObject* obj, std::wstring* name) {
 	std::wstring conv_name, full_name;
 	if (obj == NULL) {
 		(*name) = L"all";
-		return;
+		return TRUE;
 	}
 	if (obj->GetName() != NULL) {
 		native_name = obj->GetName();
