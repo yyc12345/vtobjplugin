@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+         <VIRTOOLS35_PATH>E:\Virtools\Virtools Dev 3.5</VIRTOOLS35_PATH>
+        <VIRTOOLS50_PATH>E:\Virtools\Virtools Dev 5.0</VIRTOOLS50_PATH>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    	<BuildMacro Include="VIRTOOLS35_PATH">
+			<Value>$(VIRTOOLS35_PATH)</Value>
+		</BuildMacro>
+  		<BuildMacro Include="VIRTOOLS50_PATH">
+			<Value>$(VIRTOOLS50_PATH)</Value>
+		</BuildMacro>
+  </ItemGroup>
+</Project>

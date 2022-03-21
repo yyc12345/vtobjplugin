@@ -119,6 +119,4 @@ Virtools Obj 插件
 
 此项目有两个配置，分别对应Virtools 3.5和5.0，需要各自的Virtools SDK才能编译运行。
 
-项目编译配置中指定了很多绝对路径，初见者难以修改。
-
-强烈不建议您自行编译，除非您对Virtools非常了解。
+如果您需要编译此项目，请先修改`vtobjplugin.props`中的宏定义，将其指向您的Virtools根目录（不加斜杠），然后在Visual Studio中选择合适的配置进行编译。

@@ -121,6 +121,4 @@ For reposition, click *MAXScript-Run* script in menu. Select `3dsmax.ms` and run
 
 This project have 2 configuration which corresponding with Virtools 3.5 and 5.0. It need their corresponding Virtools SDK to build.
 
-Project configuration have too much absolute path. For beginner, it is hard to build this project.
-
-It is strongly not recommended that you compile by yourself unless you know Virtools SDK very well.
+You should change some macros located in `vtobjplugin.props` before building this plugin. The macro should be pointed to your Virtools root path(without slash). Then, you can open the project in Visual Studio and choose the proper configuration to build this plugin.

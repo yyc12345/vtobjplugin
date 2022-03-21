@@ -61,6 +61,7 @@
     <None Include="vtobjplugin.def">
       <Filter>源文件</Filter>
     </None>
+    <None Include="vtobjplugin.props" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="vtobjplugin.rc">
