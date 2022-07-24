@@ -6,7 +6,7 @@ Virtools Obj Plugin.
 
 An interface plugin of Virtools which allows you to export some models as `.obj` file.
 
-Support Virtools 3.5 and 5.0
+Support Virtools 3.5, 4.0 and 5.0
 
 ## Features
 
@@ -16,7 +16,7 @@ Support Virtools 3.5 and 5.0
 * Support Blender and 3ds Max's repostion script for placing object (Place each object with the correct status in 3d software when you omit world matrix)
 * Better right-hand left-hand coordinate system conversion. (From fliping Z axis to swaping YZ axis. This is more suit for Blender and 3ds Max 3d system)
 * More material export options
-* Comparing with vt2obj, it support Virtools 3.5. It is convenient for Ballance object operation.
+* Comparing with vt2obj, it support more Virtools versions. It is convenient for Ballance object operation.
 * Support *one file per object*. It is convenient for exporting object component.
 
 ### Shortcomings
@@ -119,6 +119,6 @@ For reposition, click *MAXScript-Run* script in menu. Select `3dsmax.ms` and run
 
 ## Build
 
-This project have 2 configuration which corresponding with Virtools 3.5 and 5.0. It need their corresponding Virtools SDK to build.
+This project has various configurations which corresponding with Virtools 3.5, 4.0 and 5.0. There are also 2 build mode Debug and Release for each individual Virtools versions. It need their corresponding Virtools SDK to build.
 
 You should change some macros located in `vtobjplugin.props` before building this plugin. The macro should be pointed to your Virtools root path(without slash). Then, you can open the project in Visual Studio and choose the proper configuration to build this plugin.

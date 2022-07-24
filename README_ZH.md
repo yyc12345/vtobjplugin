@@ -6,7 +6,7 @@ Virtools Obj 插件
 
 一个Virtools界面插件，允许你以OBJ格式导出一些模型。
 
-支持Virtools 3.5和5.0
+支持Virtools 3.5，4.0和5.0
 
 ## 特性
 
@@ -16,7 +16,7 @@ Virtools Obj 插件
 * 支持Blender和3ds Max的重定位脚本，方便复位（在使用忽略世界变换矩阵后方便在编辑软件中重新放置各类模型）。
 * 支持更好的左右手坐标转换（从翻转Z轴改为交换YZ轴，更加符合Blender和3ds Max的轴向）。
 * 增加更多材质导出选项。
-* 较于vt2obj支持Virtools 3.5，方便导出。
+* 较于vt2obj支持更多Virtools版本，方便导出。
 * 支持每个物体一个文件，非常适合素材导出。
 
 ### 缺点
@@ -117,6 +117,6 @@ Virtools Obj 插件
 
 ## 编译
 
-此项目有两个配置，分别对应Virtools 3.5和5.0，需要各自的Virtools SDK才能编译运行。
+此项目有许多配置，分别对应Virtools 3.5，4.0和5.0三个版本以及他们各自的Debug和Release编译模式，需要各自的Virtools SDK才能编译。
 
 如果您需要编译此项目，请先修改`vtobjplugin.props`中的宏定义，将其指向您的Virtools根目录（不加斜杠），然后在Visual Studio中选择合适的配置进行编译。
