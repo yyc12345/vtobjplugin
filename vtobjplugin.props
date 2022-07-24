@@ -2,14 +2,34 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-         <VIRTOOLS35_PATH>E:\Virtools\Virtools Dev 3.5</VIRTOOLS35_PATH>
+        <VIRTOOLS35_PATH>E:\Virtools\Virtools Dev 3.5</VIRTOOLS35_PATH>
+        <VIRTOOLS40_PATH>E:\Virtools\Virtools Dev 4.0</VIRTOOLS40_PATH>
         <VIRTOOLS50_PATH>E:\Virtools\Virtools Dev 5.0</VIRTOOLS50_PATH>
   </PropertyGroup>
   <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <ConformanceMode>false</ConformanceMode>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;VX_MEM_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <SDLCheck>true</SDLCheck>
+      <DisableSpecificWarnings>4819;4996</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>vxmath.lib;DllEditor.lib;ck2.lib;InterfaceControls.lib;CKControls.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>vtobjplugin.def</ModuleDefinitionFile>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup />
   <ItemGroup>
     	<BuildMacro Include="VIRTOOLS35_PATH">
 			<Value>$(VIRTOOLS35_PATH)</Value>
+		</BuildMacro>
+    	<BuildMacro Include="VIRTOOLS40_PATH">
+			<Value>$(VIRTOOLS40_PATH)</Value>
 		</BuildMacro>
   		<BuildMacro Include="VIRTOOLS50_PATH">
 			<Value>$(VIRTOOLS50_PATH)</Value>

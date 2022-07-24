@@ -282,7 +282,7 @@ void obj_export::ExportObject(CK3dEntity* obj, int* storedV) {
 #if defined(TARGET_VT35)
 	WORD* fIndices = mesh->GetFacesIndices();
 #endif
-#if defined(TARGET_VT5)
+#if defined(TARGET_VT40) || defined(TARGET_VT50)
 	CKVINDEX* fIndices = mesh->GetFacesIndices();
 #endif
 	int i1, i2, i3;

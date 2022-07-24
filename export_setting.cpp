@@ -199,7 +199,7 @@ void ExportSetting::func_DialogOK() {
 	else {
 		int gottenIndex = m_ExportList.GetCurSel();
 		if (gottenIndex == CB_ERR) {
-			MessageBoxA("You should specific a export target.", "Setting error", MB_OK + MB_ICONERROR);
+			MessageBoxA("You should specific an export target.", "Setting error", MB_OK + MB_ICONERROR);
 			return;
 		}
 		res_settings.selected_item = comboboxMirror[gottenIndex];

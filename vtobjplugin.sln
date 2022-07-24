@@ -7,28 +7,26 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vtobjplugin", "vtobjplugin.
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		SlnVT35_Debug|x64 = SlnVT35_Debug|x64
 		SlnVT35_Debug|x86 = SlnVT35_Debug|x86
-		SlnVT35_Release|x64 = SlnVT35_Release|x64
 		SlnVT35_Release|x86 = SlnVT35_Release|x86
-		SlnVT5_Debug|x64 = SlnVT5_Debug|x64
-		SlnVT5_Debug|x86 = SlnVT5_Debug|x86
-		SlnVT5_Release|x64 = SlnVT5_Release|x64
-		SlnVT5_Release|x86 = SlnVT5_Release|x86
+		SlnVT40_Debug|x86 = SlnVT40_Debug|x86
+		SlnVT40_Release|x86 = SlnVT40_Release|x86
+		SlnVT50_Debug|x86 = SlnVT50_Debug|x86
+		SlnVT50_Release|x86 = SlnVT50_Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT35_Debug|x64.ActiveCfg = VT35_Debug|Win32
 		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT35_Debug|x86.ActiveCfg = VT35_Debug|Win32
 		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT35_Debug|x86.Build.0 = VT35_Debug|Win32
-		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT35_Release|x64.ActiveCfg = VT35_Release|Win32
 		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT35_Release|x86.ActiveCfg = VT35_Release|Win32
 		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT35_Release|x86.Build.0 = VT35_Release|Win32
-		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT5_Debug|x64.ActiveCfg = VT5_Debug|Win32
-		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT5_Debug|x86.ActiveCfg = VT5_Debug|Win32
-		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT5_Debug|x86.Build.0 = VT5_Debug|Win32
-		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT5_Release|x64.ActiveCfg = VT5_Release|Win32
-		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT5_Release|x86.ActiveCfg = VT5_Release|Win32
-		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT5_Release|x86.Build.0 = VT5_Release|Win32
+		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT40_Debug|x86.ActiveCfg = VT40_Debug|Win32
+		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT40_Debug|x86.Build.0 = VT40_Debug|Win32
+		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT40_Release|x86.ActiveCfg = VT40_Release|Win32
+		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT40_Release|x86.Build.0 = VT40_Release|Win32
+		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT50_Debug|x86.ActiveCfg = VT50_Debug|Win32
+		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT50_Debug|x86.Build.0 = VT50_Debug|Win32
+		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT50_Release|x86.ActiveCfg = VT50_Release|Win32
+		{BE21E1CE-8A2B-47B4-AD47-D69A021D4AAB}.SlnVT50_Release|x86.Build.0 = VT50_Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -64,7 +64,7 @@ void config_manager::LoadConfig(ExportConfig* cfg) {
 
 needInitCfg:
 	//no config, set default and save it.
-	cfg->export_mode = EXPORTMODE_GROUP;
+	cfg->export_mode = EXPORTMODE_ALL;
 	cfg->selected_item = 0;
 	cfg->file_mode = FILEMODE_ONEFILE;
 	cfg->export_folder = "";
