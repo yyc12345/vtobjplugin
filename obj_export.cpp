@@ -164,6 +164,8 @@ void obj_export::NextRepostion(CK3dEntity* obj) {
 
 	if (frepos_3dsmax != NULL) {
 		VxMatrix cacheMat = obj->GetWorldMatrix();
+		RegulateFloat(&cacheMat);
+
 		GenObjMtlName(obj, &obj_name, WRITTENFILETYPE_SCRIPT);
 		fprintf(frepos_3dsmax, "tryModify $%s (matrix3 [%f, %f, %f] [%f, %f, %f] [%f, %f, %f] [%f, %f, %f])\n",
 			obj_name.c_str(),
@@ -174,6 +176,8 @@ void obj_export::NextRepostion(CK3dEntity* obj) {
 	}
 	if (frepos_blender != NULL) {
 		VxMatrix cacheMat = obj->GetWorldMatrix();
+		RegulateFloat(&cacheMat);
+
 		GenObjMtlName(obj, &obj_name, WRITTENFILETYPE_SCRIPT);
 		fprintf(frepos_blender, "tryModify('%s', Matrix(((%f, %f, %f, %f), (%f, %f, %f, %f), (%f, %f, %f, %f), (%f, %f, %f, %f))))\n",
 			obj_name.c_str(),
@@ -250,9 +254,13 @@ void obj_export::ExportObject(CK3dEntity* obj, int* storedV) {
 	for (int i = 0; i < count; i++) {
 		mesh->GetVertexPosition(i, &cacheVec1);
 		if (cfg->omit_transform) {
+			RegulateFloat(&cacheVec1);
+
 			fprintf(fObj, "v %f %f %f\n", cacheVec1.x, righthand_pos_converter(cfg->right_hand, cacheVec1.y, cacheVec1.z));
 		} else {
 			Vx3DMultiplyMatrixVector(&cacheVec2, cacheMat, &cacheVec1);
+			RegulateFloat(&cacheVec2);
+
 			fprintf(fObj, "v %f %f %f\n", cacheVec2.x, righthand_pos_converter(cfg->right_hand, cacheVec2.y, cacheVec2.z));
 		}
 	}
@@ -261,12 +269,17 @@ void obj_export::ExportObject(CK3dEntity* obj, int* storedV) {
 	float u, v;
 	for (int i = 0; i < count; i++) {
 		mesh->GetVertexTextureCoordinates(i, &u, &v);
+		RegulateFloat(&u);
+		RegulateFloat(&v);
+
 		fprintf(fObj, "vt %f %f 0\n", righthand_uv_converter(cfg->right_hand, u, v));
 	}
 
 	//vn
 	for (int i = 0; i < count; i++) {
 		mesh->GetVertexNormal(i, &cacheVec1);
+		RegulateFloat(&cacheVec1);
+
 		fprintf(fObj, "vn %f %f %f\n", cacheVec1.x, righthand_pos_converter(cfg->right_hand, cacheVec1.y, cacheVec1.z));
 	}
 
@@ -343,10 +356,13 @@ void obj_export::ExportMaterial(CKMaterial* mtl) {
 	GenObjMtlName(mtl, &mat_name, WRITTENFILETYPE_OBJMTL);
 	fprintf(fMtl, "newmtl %s\n", mat_name.c_str());
 	VxColor col = mtl->GetAmbient();
+	RegulateFloat(&col);
 	fprintf(fMtl, "Ka %f %f %f\n", col.r, col.g, col.b);
 	col = mtl->GetDiffuse();
+	RegulateFloat(&col);
 	fprintf(fMtl, "Kd %f %f %f\n", col.r, col.g, col.b);
 	col = mtl->GetEmissive();
+	RegulateFloat(&col);
 	fprintf(fMtl, "Ks %f %f %f\n", col.r, col.g, col.b);
 
 	//set up texture
@@ -610,3 +626,32 @@ void obj_export::RegulateNameW(std::wstring* str, BOOL eliminate4filebody) {
 	}
 }
 
+#define float_correction(f, def) ((std::isnormal(f) || (f) == 0.0f) ? (f) : (def))
+void obj_export::RegulateFloat(VxVector* v) {
+	// correct vec with its original sign.
+	v->x = float_correction(v->x, std::signbit(v->x) ? -1.0f : 1.0f);
+	v->y = float_correction(v->y, std::signbit(v->x) ? -1.0f : 1.0f);
+	v->z = float_correction(v->z, std::signbit(v->x) ? -1.0f : 1.0f);
+}
+
+void obj_export::RegulateFloat(VxMatrix* mat) {
+	// main cross item should be corrected into 1.0f, others will be set as 0.0f.
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			(*mat)[i][j] = float_correction((*mat)[i][j], i == j ? 1.0f : 0.0f);
+		}
+	}
+}
+
+void obj_export::RegulateFloat(VxColor* c) {
+	// color should always be corrected into zero.
+	c->r = float_correction(c->r, 0.0f);
+	c->g = float_correction(c->g, 0.0f);
+	c->b = float_correction(c->b, 0.0f);
+}
+
+void obj_export::RegulateFloat(float* f) {
+	// correction with sign
+	*f = float_correction(*f, std::signbit(*f) ? -1.0f : 1.0f);
+}
+#undef float_correction

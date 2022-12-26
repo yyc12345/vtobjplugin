@@ -95,6 +95,11 @@ class obj_export {
 	void RegulateNameA(std::string* str, BOOL eliminate4filebody);
 	void RegulateNameW(std::wstring* str, BOOL eliminate4filebody);
 
+	void RegulateFloat(VxVector* v);
+	void RegulateFloat(VxMatrix* mat);
+	void RegulateFloat(VxColor* c);
+	void RegulateFloat(float* f);
+
 	FILE* fObj;
 	FILE* fMtl;
 	FILE* frepos_3dsmax;
