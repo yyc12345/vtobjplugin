@@ -24,6 +24,15 @@
     <ClCompile Include="Utilities.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="ExportSettingDialog.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="ExportReportDialog.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigManager.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.hpp">
@@ -36,6 +45,18 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Utilities.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="DataTypes.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ExportSettingDialog.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ExportReportDialog.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigManager.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

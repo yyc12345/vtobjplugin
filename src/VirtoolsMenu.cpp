@@ -1,6 +1,8 @@
 #pragma once
 #include "VirtoolsMenu.hpp"
 #include "Utilities.hpp"
+#include "ExportSettingDialog.hpp"
+#include <memory>
 
 namespace vtobjplugin::VirtoolsMenu {
 
@@ -12,20 +14,27 @@ namespace vtobjplugin::VirtoolsMenu {
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 		auto& string_loader = Utilities::StringLoader::GetSingleton();
 
-		if (command_id == 0) {
-			CKContext* ctx = g_Plugininterface->GetCKContext();
-			AfxMessageBox("Work in Progress...", MB_ICONINFORMATION + MB_OK);
+		switch (command_id) {
+			case 0:
+			{
+				CKContext* ctx = g_Plugininterface->GetCKContext();
+				auto export_setting_dialog = std::make_unique<ExportSettingDialog>(ctx, nullptr);
+				if (export_setting_dialog->DoModal() != IDOK) break;
 
-			ctx->OutputToConsole("[vtobjplugin] Export OK!");
-		} else if (command_id == 1) {
-			ShellExecuteW(NULL, L"open", L"https://github.com/yyc12345/vtobjplugin/issues", NULL, NULL, SW_SHOWNORMAL);
-		} else if (command_id == 2) {
-			MessageBoxW(
-				nullptr,
-				L"vtobjplugin v3.0 - A Wavefront OBJ Exporter for Virtools.\nUnder GPL v3 License.\nProject Home Page: https://github.com/yyc12345/vtobjplugin",
-				L"About vtobjplugin",
-				MB_ICONINFORMATION + MB_OK
-			);
+				ctx->OutputToConsole("[vtobjplugin] Export OK!");
+				break;
+			}
+			case 1:
+				ShellExecuteW(NULL, L"open", L"https://github.com/yyc12345/vtobjplugin/issues", NULL, NULL, SW_SHOWNORMAL);
+				break;
+			case 2:
+				MessageBoxW(
+					nullptr,
+					L"vtobjplugin v3.0 - A Wavefront OBJ Exporter for Virtools.\nUnder GPL v3 License.\nProject Home Page: https://github.com/yyc12345/vtobjplugin",
+					L"About vtobjplugin",
+					MB_ICONINFORMATION + MB_OK
+				);
+				break;
 		}
 
 	}
@@ -47,10 +56,10 @@ namespace vtobjplugin::VirtoolsMenu {
 		g_Plugininterface->ClearPluginMenu(g_MainMenu);
 
 		auto& string_loader = Utilities::StringLoader::GetSingleton();
-		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 0, string_loader.LoadStringA(IDS_VTOBJPLG__MENU__EXPORT_OBJECTS, "Export Objects"));
+		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 0, string_loader.LoadStringA(IDS_VTOBJPLG__MENU__EXPORT_OBJECTS, "Export Objects").c_str());
 		g_Plugininterface->AddPluginMenuItem(g_MainMenu, -1, NULL, TRUE);
-		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 1, string_loader.LoadStringA(IDS_VTOBJPLG__MENU__REPORT_BUG, "Report Bug"));
-		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 2, string_loader.LoadStringA(IDS_VTOBJPLG__MENU__ABOUT_VTOBJPLUGIN, "About vtobjplugin"));
+		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 1, string_loader.LoadStringA(IDS_VTOBJPLG__MENU__REPORT_BUG, "Report Bug").c_str());
+		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 2, string_loader.LoadStringA(IDS_VTOBJPLG__MENU__ABOUT_VTOBJPLUGIN, "About vtobjplugin").c_str());
 
 
 		g_Plugininterface->UpdatePluginMenu(g_MainMenu);

@@ -10,14 +10,11 @@ namespace vtobjplugin::Utilities {
 		StringLoader();
 
 	public:
-		const wchar_t* LoadStringW(UINT uID, const wchar_t* fallback = L"");
-		const char* LoadStringA(UINT uID, const char* fallback = "");
+		std::wstring LoadStringW(UINT uID, const wchar_t* fallback = L"");
+		std::string LoadStringA(UINT uID, const char* fallback = "");
 	private:
-		bool InternalLoad(UINT uID);
-
+		bool InternalLoadString(UINT uID, std::wstring& dst);
 		HINSTANCE m_Instance;
-		std::string m_CharCache;
-		std::wstring m_WcharCache;
 	};
 
 }
