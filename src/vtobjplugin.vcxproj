@@ -73,7 +73,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>$(ProjectDir)vtobjplugin.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(YYCC_PATH)\lib\$(Platform)\$(Configuration);$(VIRTOOLS_PATH)\Sdk\Lib;$(VIRTOOLS_PATH)\Sdk\Lib\Win32\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>VxMath.lib;DllEditor.lib;CK2.lib;InterfaceControls.lib;CKControls.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>VxMath.lib;DllEditor.lib;CK2.lib;InterfaceControls.lib;CKControls.lib;YYCCommonplace.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -96,16 +96,22 @@
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <ModuleDefinitionFile>$(ProjectDir)vtobjplugin.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(YYCC_PATH)\lib\$(Platform)\$(Configuration);$(VIRTOOLS_PATH)\Sdk\Lib;$(VIRTOOLS_PATH)\Sdk\Lib\Win32\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>VxMath.lib;DllEditor.lib;CK2.lib;InterfaceControls.lib;CKControls.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>VxMath.lib;DllEditor.lib;CK2.lib;InterfaceControls.lib;CKControls.lib;YYCCommonplace.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="VirtoolsMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.hpp" />
+    <ClInclude Include="Utilities.hpp" />
     <ClInclude Include="VirtoolsMenu.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="vtobjplugin.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

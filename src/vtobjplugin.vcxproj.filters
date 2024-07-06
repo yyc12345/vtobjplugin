@@ -21,6 +21,9 @@
     <ClCompile Include="VirtoolsMenu.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Utilities.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.hpp">
@@ -29,5 +32,16 @@
     <ClInclude Include="VirtoolsMenu.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="vtobjplugin.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

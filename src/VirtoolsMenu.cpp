@@ -1,6 +1,6 @@
 #pragma once
-#include "stdafx.hpp"
 #include "VirtoolsMenu.hpp"
+#include "Utilities.hpp"
 
 namespace vtobjplugin::VirtoolsMenu {
 
@@ -10,6 +10,7 @@ namespace vtobjplugin::VirtoolsMenu {
 
 	static void PluginMenuCallback(int command_id) {
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
+		auto& string_loader = Utilities::StringLoader::GetSingleton();
 
 		if (command_id == 0) {
 			CKContext* ctx = g_Plugininterface->GetCKContext();
@@ -19,7 +20,12 @@ namespace vtobjplugin::VirtoolsMenu {
 		} else if (command_id == 1) {
 			ShellExecuteW(NULL, L"open", L"https://github.com/yyc12345/vtobjplugin/issues", NULL, NULL, SW_SHOWNORMAL);
 		} else if (command_id == 2) {
-			AfxMessageBox("vtobjplugin v3.0 - A Wavefront OBJ Exporter for Virtools.\nUnder GPL v3 License.\nProject Home Page: https://github.com/yyc12345/vtobjplugin", MB_ICONINFORMATION + MB_OK);
+			MessageBoxW(
+				nullptr,
+				L"vtobjplugin v3.0 - A Wavefront OBJ Exporter for Virtools.\nUnder GPL v3 License.\nProject Home Page: https://github.com/yyc12345/vtobjplugin",
+				L"About vtobjplugin",
+				MB_ICONINFORMATION + MB_OK
+			);
 		}
 
 	}
@@ -40,10 +46,11 @@ namespace vtobjplugin::VirtoolsMenu {
 	static void UpdateMenu() {
 		g_Plugininterface->ClearPluginMenu(g_MainMenu);
 
-		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 0, "Export object");
+		auto& string_loader = Utilities::StringLoader::GetSingleton();
+		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 0, string_loader.LoadStringA(IDS_VTOBJPLG__MENU__EXPORT_OBJECTS, "Export Objects"));
 		g_Plugininterface->AddPluginMenuItem(g_MainMenu, -1, NULL, TRUE);
-		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 1, "Report bug");
-		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 2, "About vtobjplugin");
+		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 1, string_loader.LoadStringA(IDS_VTOBJPLG__MENU__REPORT_BUG, "Report Bug"));
+		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 2, string_loader.LoadStringA(IDS_VTOBJPLG__MENU__ABOUT_VTOBJPLUGIN, "About vtobjplugin"));
 
 
 		g_Plugininterface->UpdatePluginMenu(g_MainMenu);
