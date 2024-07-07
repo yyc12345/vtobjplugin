@@ -4,6 +4,8 @@
 
 namespace vtobjplugin {
 
+	static const DataTypes::ExportSetting g_DefaultExportSetting;
+
 	ConfigManager& ConfigManager::GetSingleton() {
 		static ConfigManager g_ConfigManager;
 		return g_ConfigManager;
@@ -17,30 +19,31 @@ namespace vtobjplugin {
 		return YYCC::FsPathPatch::ToUTF8Path(vt_path);
 	}
 
+#define INIT_HELPER(name) name(YYCC_U8( #name ), g_DefaultExportSetting.name)
 	ConfigManager::ConfigManager() :
-		m_ExportMode(YYCC_U8("export-mode"), DataTypes::ExportMode::All),
-		m_FileMode(YYCC_U8("file-mode"), DataTypes::FileMode::OneFile),
-		m_ExportDirectory(YYCC_U8("export-directory"), YYCC_U8("")),
+		INIT_HELPER(m_ExportMode),
+		INIT_HELPER(m_FileMode),
+		INIT_HELPER(m_ExportDirectory),
 
-		m_IgnoreTransform(YYCC_U8("ignore-transform"), true),
-		m_ConvertToRightHand(YYCC_U8("convert-to-right-hand"), true),
-		m_UseNamePrefix(YYCC_U8("use-name-prefix"), false),
-		m_UseGroupSplittor(YYCC_U8("sue-group-splittor"), true),
-		m_EliminateNonAscii(YYCC_U8("eliminate-non-ascii"), false),
+		INIT_HELPER(m_IgnoreTransform),
+		INIT_HELPER(m_ConvertToRightHand),
+		INIT_HELPER(m_UseNamePrefix),
+		INIT_HELPER(m_UseGroupSplittor),
+		INIT_HELPER(m_EliminateNonAscii),
 
-		m_Generate3dsMaxScript(YYCC_U8("generate-3ds-max-script"), false),
-		m_GenerateBlenderScript(YYCC_U8("generate-blender-script"), false),
+		INIT_HELPER(m_Generate3dsMaxScript),
+		INIT_HELPER(m_GenerateBlenderScript),
 
-		m_ExportMaterial(YYCC_U8("export-material"), true),
-		m_ExportTexture(YYCC_U8("export-texture"), true),
-		m_CopyTexture(YYCC_U8("copy-texture"), false),
-		m_UseCustomTextureFormat(YYCC_U8("use-custom-texture-format"), true),
-		m_CustomTextureFormat(YYCC_U8("custom-texture-format"), YYCC_U8("bmp")),
+		INIT_HELPER(m_ExportMaterial),
+		INIT_HELPER(m_ExportTexture),
+		INIT_HELPER(m_CopyTexture),
+		INIT_HELPER(m_UseCustomTextureFormat),
+		INIT_HELPER(m_CustomTextureFormat),
 
-		m_UseCustomEncoding(YYCC_U8("use-custom-encoding"), false),
-		m_CustomEncoding(YYCC_U8("custom-encoding"), CP_ACP),
-		m_UseUTF8ObjMtl(YYCC_U8("use-utf8-obj-mtl"), false),
-		m_UseUTF8Script(YYCC_U8("use-utf8-script"), false),
+		INIT_HELPER(m_UseCustomEncoding),
+		INIT_HELPER(m_CustomEncoding),
+		INIT_HELPER(m_UseUTF8ObjMtl),
+		INIT_HELPER(m_UseUTF8Script),
 
 		m_CoreManager(ConfigManager::GetConfigFilePath().c_str(), UINT64_C(150), {
 			&m_ExportMode, &m_FileMode, &m_ExportDirectory,
@@ -49,5 +52,67 @@ namespace vtobjplugin {
 			&m_ExportMaterial, &m_ExportTexture, &m_CopyTexture, &m_UseCustomTextureFormat, &m_CustomTextureFormat,
 			&m_UseCustomEncoding, &m_CustomEncoding, &m_UseUTF8ObjMtl, &m_UseUTF8Script
 		}) {}
+#undef INIT_HELPER
+
+
+	void ConfigManager::GetSettings(DataTypes::ExportSetting& settings) {
+#define COPY_HELPER(name) settings.name = this->name.Get()
+
+		COPY_HELPER(m_ExportMode);
+		COPY_HELPER(m_FileMode);
+		COPY_HELPER(m_ExportDirectory);
+
+		COPY_HELPER(m_IgnoreTransform);
+		COPY_HELPER(m_ConvertToRightHand);
+		COPY_HELPER(m_UseNamePrefix);
+		COPY_HELPER(m_UseGroupSplittor);
+		COPY_HELPER(m_EliminateNonAscii);
+
+		COPY_HELPER(m_Generate3dsMaxScript);
+		COPY_HELPER(m_GenerateBlenderScript);
+
+		COPY_HELPER(m_ExportMaterial);
+		COPY_HELPER(m_ExportTexture);
+		COPY_HELPER(m_CopyTexture);
+		COPY_HELPER(m_UseCustomTextureFormat);
+		COPY_HELPER(m_CustomTextureFormat);
+
+		COPY_HELPER(m_UseCustomEncoding);
+		COPY_HELPER(m_CustomEncoding);
+		COPY_HELPER(m_UseUTF8ObjMtl);
+		COPY_HELPER(m_UseUTF8Script);
+
+#undef COPY_HELPER
+	}
+
+	void ConfigManager::SetSettings(const DataTypes::ExportSetting& settings) {
+#define COPY_HELPER(name) this->name.Set(settings.name)
+
+		COPY_HELPER(m_ExportMode);
+		COPY_HELPER(m_FileMode);
+		COPY_HELPER(m_ExportDirectory);
+
+		COPY_HELPER(m_IgnoreTransform);
+		COPY_HELPER(m_ConvertToRightHand);
+		COPY_HELPER(m_UseNamePrefix);
+		COPY_HELPER(m_UseGroupSplittor);
+		COPY_HELPER(m_EliminateNonAscii);
+
+		COPY_HELPER(m_Generate3dsMaxScript);
+		COPY_HELPER(m_GenerateBlenderScript);
+
+		COPY_HELPER(m_ExportMaterial);
+		COPY_HELPER(m_ExportTexture);
+		COPY_HELPER(m_CopyTexture);
+		COPY_HELPER(m_UseCustomTextureFormat);
+		COPY_HELPER(m_CustomTextureFormat);
+
+		COPY_HELPER(m_UseCustomEncoding);
+		COPY_HELPER(m_CustomEncoding);
+		COPY_HELPER(m_UseUTF8ObjMtl);
+		COPY_HELPER(m_UseUTF8Script);
+
+#undef COPY_HELPER
+	}
 
 }

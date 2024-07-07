@@ -12,6 +12,32 @@ namespace vtobjplugin::DataTypes {
 	};
 
 	struct ExportSetting {
+		ExportSetting() :
+			m_ExportMode(ExportMode::All),
+			m_AssociatedExportItem((CK_ID)0),
+			m_FileMode(FileMode::OneFile),
+			m_ExportDirectory(YYCC_U8("")),
+
+			m_IgnoreTransform(true),
+			m_ConvertToRightHand(true),
+			m_UseNamePrefix(false),
+			m_UseGroupSplittor(true),
+			m_EliminateNonAscii(false),
+
+			m_Generate3dsMaxScript(false),
+			m_GenerateBlenderScript(false),
+
+			m_ExportMaterial(true),
+			m_ExportTexture(true),
+			m_CopyTexture(false),
+			m_UseCustomTextureFormat(false),
+			m_CustomTextureFormat(YYCC_U8("bmp")),
+
+			m_UseCustomEncoding(false),
+			m_CustomEncoding(CP_ACP),
+			m_UseUTF8ObjMtl(false),
+			m_UseUTF8Script(false) {}
+
 		ExportMode m_ExportMode;
 		CK_ID m_AssociatedExportItem;
 		FileMode m_FileMode;
