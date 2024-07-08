@@ -30,6 +30,9 @@ namespace vtobjplugin {
 		afx_msg void OnBtnResetClicked();
 		afx_msg void OnBtnBrowseClicked();
 
+		afx_msg void OnBtnExportModeClicked();
+		afx_msg void OnBtnDisableHierarchyClicked();
+
 	protected:
 		// ===== Controls =====
 		// General Settings
@@ -68,10 +71,19 @@ namespace vtobjplugin {
 		std::vector<CK_ID> m_AssocExportItemListCache; ///< Storing displayed associated export items list because UI only display their names.
 		DataTypes::ExportMode m_ExportModeCache; ///< Storing current selected export mode for the convenience of detecting the change of export mode.
 		YYCC::yycc_u8string m_ExportDirectoryCache; ///< Storing picked export directory because UI can not handle worldwide characters.
-		// ===== Functions =====
+		// ===== Pull Push Functions =====
+		DataTypes::ExportMode PullExportMode();
+		void PushExportMode(DataTypes::ExportMode export_mode);
+		DataTypes::FileMode PullFileMode();
+		void PushFileMode(DataTypes::FileMode file_mode);
+		DataTypes::ObjectSplitMode PullObjectSplitMode();
+		void PushObjectSplitMode(DataTypes::ObjectSplitMode object_split_mode);
+		DataTypes::CompositionEncoding PullCompositionEncoding();
+		void PushCompositionEncoding(DataTypes::CompositionEncoding composition_encoding);
+		// ===== Update Functions =====
 		void UpdateAssocExportItems(); ///< Update associated export item list when export mode changed.
 		void UpdateDisableHierarchy(); ///< Update disable status for specific controls according to the selection status of other controls.
-		void UpdateExportDirectory(const YYCC::yycc_u8string& export_dir); ///< Update internal export directory variable and control display text.
+		void UpdateExportDirectory(); ///< Update export directory control display text from internal cache.
 	};
 
 }
