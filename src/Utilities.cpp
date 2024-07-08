@@ -27,6 +27,14 @@ namespace vtobjplugin::Utilities {
 		return ret;
 	}
 
+	YYCC::yycc_u8string StringLoader::LoadStringU8(UINT uID, const YYCC::yycc_char8_t* fallback) {
+		std::wstring wret;
+		YYCC::yycc_u8string ret;
+		if (!InternalLoadString(uID, wret) || !YYCC::EncodingHelper::WcharToUTF8(wret, ret)) 
+			ret = (fallback == nullptr ? YYCC_U8("") : fallback);
+		return ret;
+	}
+
 	bool StringLoader::InternalLoadString(UINT uID, std::wstring& dst) {
 		wchar_t* str_ptr = nullptr;
 		int str_length = ::LoadStringW(m_Instance, uID, reinterpret_cast<LPWSTR>(&str_ptr), 0);
@@ -38,5 +46,30 @@ namespace vtobjplugin::Utilities {
 
 #pragma endregion
 
+
+	void SetCWndText(CWnd* ctl, const YYCC::yycc_u8string_view& val) {
+		HWND hwnd = ctl->m_hWnd;
+		auto wval(YYCC::EncodingHelper::UTF8ToWchar(val));
+		SetWindowTextW(hwnd, wval.data());
+	}
+
+	//YYCC::yycc_u8string GetCWndText(CWnd* ctl) {
+	//	HWND hwnd = ctl->m_hWnd;
+	//	YYCC::yycc_u8string ret;
+	//	std::wstring wret;
+
+	//	// Ref: https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowtextlengthw
+	//	SetLastError(ERROR_SUCCESS);
+	//	int len = GetWindowTextLengthW(hwnd);
+	//	if (len == 0 && GetLastError() != ERROR_SUCCESS) 
+	//		return ret;
+
+	//	int copied = GetWindowTextW(hwnd, wret.data(), len);
+	//	if (len == 0 && GetLastError() != ERROR_SUCCESS) 
+	//		return ret;
+
+	//	ret = YYCC::EncodingHelper::WcharToUTF8(wret);
+	//	return ret;
+	//}
 
 }

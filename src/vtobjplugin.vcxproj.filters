@@ -27,9 +27,6 @@
     <ClCompile Include="ExportSettingDialog.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="ExportReportDialog.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
     <ClCompile Include="ConfigManager.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
@@ -51,9 +48,6 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="ExportSettingDialog.hpp">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="ExportReportDialog.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="ConfigManager.hpp">

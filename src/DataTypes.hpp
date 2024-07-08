@@ -11,6 +11,14 @@ namespace vtobjplugin::DataTypes {
 		OneFile, MultiFile
 	};
 
+	enum class ObjectSplitMode {
+		Group, Object
+	};
+
+	enum class CompositionEncoding {
+		System, Custom
+	};
+
 	struct ExportSetting {
 		ExportSetting() :
 			m_ExportMode(ExportMode::All),
@@ -21,7 +29,7 @@ namespace vtobjplugin::DataTypes {
 			m_IgnoreTransform(true),
 			m_ConvertToRightHand(true),
 			m_UseNamePrefix(false),
-			m_UseGroupSplittor(true),
+			m_ObjectSplitMode(ObjectSplitMode::Group),
 			m_EliminateNonAscii(false),
 
 			m_Generate3dsMaxScript(false),
@@ -33,7 +41,7 @@ namespace vtobjplugin::DataTypes {
 			m_UseCustomTextureFormat(false),
 			m_CustomTextureFormat(YYCC_U8("bmp")),
 
-			m_UseCustomEncoding(false),
+			m_CompositionEncoding(CompositionEncoding::System),
 			m_CustomEncoding(CP_ACP),
 			m_UseUTF8ObjMtl(false),
 			m_UseUTF8Script(false) {}
@@ -46,7 +54,7 @@ namespace vtobjplugin::DataTypes {
 		bool m_IgnoreTransform;
 		bool m_ConvertToRightHand;
 		bool m_UseNamePrefix;
-		bool m_UseGroupSplittor;
+		ObjectSplitMode m_ObjectSplitMode;
 		bool m_EliminateNonAscii;
 
 		bool m_Generate3dsMaxScript;
@@ -58,7 +66,7 @@ namespace vtobjplugin::DataTypes {
 		bool m_UseCustomTextureFormat;
 		YYCC::yycc_u8string m_CustomTextureFormat;
 
-		bool m_UseCustomEncoding;
+		CompositionEncoding m_CompositionEncoding;
 		UINT m_CustomEncoding;
 		bool m_UseUTF8ObjMtl;
 		bool m_UseUTF8Script;

@@ -3,7 +3,6 @@
 // Used by vtobjplugin.rc
 //
 #define IDD_EXPORT_SETTING_DIALOG       101
-#define IDD_EXPORT_REPORT_DIALOG        103
 #define IDS_VTOBJPLG__MENU__EXPORT_OBJECTS 105
 #define IDS_VTOBJPLG__MENU__REPORT_BUG  106
 #define IDS_VTOBJPLG__MENU__ABOUT_VTOBJPLUGIN 107
@@ -34,9 +33,6 @@
 #define IDC_EDIT3                       1025
 #define IDC_CHECK11                     1026
 #define IDC_CHECK12                     1027
-#define IDC_LIST1                       1028
-#define IDC_PROGRESS1                   1029
-#define IDC_COMBO2                      1030
 #define IDC_BUTTON2                     1031
 
 // Next default values for new objects

@@ -11,8 +11,8 @@ namespace vtobjplugin {
 		static YYCC::yycc_u8string GetConfigFilePath();
 		ConfigManager();
 
-		void GetSettings(DataTypes::ExportSetting& settings);
-		void SetSettings(const DataTypes::ExportSetting& settings);
+		//void GetSettings(DataTypes::ExportSetting& settings);
+		//void SetSettings(const DataTypes::ExportSetting& settings);
 
 	public:
 		YYCC::ConfigManager::NumberSetting<DataTypes::ExportMode> m_ExportMode;
@@ -23,8 +23,8 @@ namespace vtobjplugin {
 			m_IgnoreTransform,
 			m_ConvertToRightHand,
 			m_UseNamePrefix,
-			m_UseGroupSplittor,
 			m_EliminateNonAscii;
+		YYCC::ConfigManager::NumberSetting<DataTypes::ObjectSplitMode> m_ObjectSplitMode;
 
 		YYCC::ConfigManager::NumberSetting<bool>
 			m_Generate3dsMaxScript,
@@ -37,11 +37,11 @@ namespace vtobjplugin {
 			m_UseCustomTextureFormat;
 		YYCC::ConfigManager::StringSetting m_CustomTextureFormat;
 
+		YYCC::ConfigManager::NumberSetting<DataTypes::CompositionEncoding> m_CompositionEncoding;
+		YYCC::ConfigManager::NumberSetting<UINT> m_CustomEncoding;
 		YYCC::ConfigManager::NumberSetting<bool>
-			m_UseCustomEncoding,
 			m_UseUTF8ObjMtl,
 			m_UseUTF8Script;
-		YYCC::ConfigManager::NumberSetting<UINT> m_CustomEncoding;
 
 		YYCC::ConfigManager::CoreManager m_CoreManager;
 	};
