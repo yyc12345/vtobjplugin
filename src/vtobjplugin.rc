@@ -60,14 +60,106 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Dialog
+//
+
+IDD_EXPORT_SETTING_DIALOG DIALOGEX 0, 0, 351, 482
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Wavefront OBJ 导出设置"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "好",IDOK,241,462,50,14
+    PUSHBUTTON      "取消",IDCANCEL,293,462,50,14
+    GROUPBOX        "常规设置",IDC_STATIC,6,6,336,78
+    LTEXT           "导出模式:",IDC_STATIC,12,18,36,8
+    CONTROL         "一个物体",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,84,18,48,10
+    CONTROL         "一个组",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,150,18,40,10
+    CONTROL         "选中的物体",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,204,18,66,10
+    CONTROL         "全部",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON,276,18,36,10
+    COMBOBOX        IDC_COMBO1,12,30,324,222,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "文件模式:",IDC_STATIC,12,48,36,8
+    CONTROL         "所有物体一个文件",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON | WS_GROUP,84,48,80,10
+    CONTROL         "一个物体一个文件",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON,204,48,80,10
+    LTEXT           "导出目录：",IDC_STATIC,12,68,41,8
+    EDITTEXT        IDC_EDIT1,54,66,228,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "浏览",IDC_BUTTON1,286,66,50,14
+    GROUPBOX        "物体设置",IDC_STATIC,6,90,336,102
+    LTEXT           "拆分物体方式: ",IDC_STATIC,12,103,54,8
+    CONTROL         "Group 语句",IDC_RADIO7,"Button",BS_AUTORADIOBUTTON | WS_GROUP,84,102,53,10
+    CONTROL         "Object 语句",IDC_RADIO8,"Button",BS_AUTORADIOBUTTON,204,102,55,10
+    CONTROL         "忽略物体空间变换",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,120,80,10
+    CONTROL         "转换到右手坐标系",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,138,80,10
+    CONTROL         "添加名称前缀",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,156,64,10
+    CONTROL         "移除非 ASCII 字符",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,174,79,10
+    GROUPBOX        "重新放置设置",IDC_STATIC,6,198,336,54
+    CONTROL         "生成 3ds Max 重新放置脚本 (3dsmax.ms)",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,216,154,10
+    CONTROL         "生成 Blender 重新放置脚本 (blender.py)",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,234,150,10
+    GROUPBOX        "材质设置",IDC_STATIC,6,258,336,108
+    CONTROL         "导出材质 (.mtl 文件)",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,276,85,10
+    CONTROL         "导出贴图 (map_Kd 语句)",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,294,99,10
+    CONTROL         "复制贴图文件",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,311,64,10
+    CONTROL         "自定义贴图格式: (默认支持 BMP, TGA, JPG, PNG, GIF)",IDC_CHECK10,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,330,198,10
+    EDITTEXT        IDC_EDIT2,25,346,312,14,ES_AUTOHSCROLL
+    GROUPBOX        "编码设置",IDC_STATIC,6,372,336,66
+    LTEXT           "文档编码:",IDC_STATIC,12,386,36,8
+    CONTROL         "系统",IDC_RADIO9,"Button",BS_AUTORADIOBUTTON | WS_GROUP,129,385,32,10
+    CONTROL         "自定义",IDC_RADIO10,"Button",BS_AUTORADIOBUTTON,181,385,40,10
+    EDITTEXT        IDC_EDIT3,230,383,107,14,ES_AUTOHSCROLL
+    CONTROL         "在物体和材质文件中使用 UTF8",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,402,123,10
+    CONTROL         "在脚本文件中使用 UTF8",IDC_CHECK12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,420,99,10
+    LTEXT           "vtobjplugin - v3.0",IDC_STATIC,6,444,58,8
+    PUSHBUTTON      "重置为默认",IDC_BUTTON2,6,462,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_EXPORT_SETTING_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 6
+        RIGHTMARGIN, 342
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 475
+        HORZGUIDE, 172
+        HORZGUIDE, 198
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_EXPORT_SETTING_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // String Table
 //
 
 STRINGTABLE
 BEGIN
-    IDS_VTOBJPLG__MENU__EXPORT_OBJECTS "导出物体"
-    IDS_VTOBJPLG__MENU__REPORT_BUG "汇报错误"
-    IDS_VTOBJPLG__MENU__ABOUT_VTOBJPLUGIN "关于 vtobjplugin"
+    IDS_VTOBJPLG__VT_MENU__MENU_EXPORT_OBJECTS "导出物体"
+    IDS_VTOBJPLG__VT_MENU__MENU_REPORT_BUG "汇报错误"
+    IDS_VTOBJPLG__VT_MENU__MENU_ABOUT "关于 vtobjplugin"
+    IDS_VTOBJPLG__VT_MENU__ABOUT_TITLE "关于 vtobjplugin"
+    IDS_VTOBJPLG__VT_MENU__ABOUT_BODY 
+                            "vtobjplugin v3.0 - 适用于 Virtools 的 Wavefront OBJ 导出器。\n基于 GPL v3 许可证。\n项目主页: https://github.com/yyc12345/vtobjplugin"
+    IDS_VTOBJPLG__VT_MENU__SUCCESS_NOTE "Wavefront OBJ 导出完成。"
 END
 
 #endif    // Chinese (Simplified) resources
@@ -255,9 +347,13 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_VTOBJPLG__MENU__EXPORT_OBJECTS "Export Objects"
-    IDS_VTOBJPLG__MENU__REPORT_BUG "Report Bug"
-    IDS_VTOBJPLG__MENU__ABOUT_VTOBJPLUGIN "About vtobjplugin"
+    IDS_VTOBJPLG__VT_MENU__MENU_EXPORT_OBJECTS "Export Objects"
+    IDS_VTOBJPLG__VT_MENU__MENU_REPORT_BUG "Report Bug"
+    IDS_VTOBJPLG__VT_MENU__MENU_ABOUT "About vtobjplugin"
+    IDS_VTOBJPLG__VT_MENU__ABOUT_TITLE "About vtobjplugin"
+    IDS_VTOBJPLG__VT_MENU__ABOUT_BODY 
+                            "vtobjplugin v3.0 - A Wavefront OBJ Exporter for Virtools.\nUnder GPL v3 License.\nProject Home Page: https://github.com/yyc12345/vtobjplugin"
+    IDS_VTOBJPLG__VT_MENU__SUCCESS_NOTE "Wavefront OBJ Export Done."
 END
 
 #endif    // English (United States) resources

@@ -29,7 +29,6 @@ namespace vtobjplugin {
 		afx_msg void OnBtnCancelClicked();
 		afx_msg void OnBtnResetClicked();
 		afx_msg void OnBtnBrowseClicked();
-
 		afx_msg void OnBtnExportModeClicked();
 		afx_msg void OnBtnDisableHierarchyClicked();
 
