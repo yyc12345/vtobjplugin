@@ -22,7 +22,7 @@ namespace vtobjplugin::VirtoolsMenu {
 				if (export_setting_dialog->DoModal() != IDOK) break;
 
 				
-				auto success_note = string_loader.LoadStringA(IDS_VTOBJPLG__VT_MENU__SUCCESS_NOTE);
+				auto success_note = string_loader.LoadStringA(IDS_VTMENU_SUCCESS_NOTE);
 				ctx->OutputToInfo(const_cast<CKSTRING>(success_note.c_str()));
 				ctx->OutputToConsole(const_cast<CKSTRING>(success_note.c_str()));
 				break;
@@ -33,8 +33,8 @@ namespace vtobjplugin::VirtoolsMenu {
 			case 2:
 				MessageBoxW(
 					nullptr,
-					string_loader.LoadStringW(IDS_VTOBJPLG__VT_MENU__ABOUT_BODY).c_str(),
-					string_loader.LoadStringW(IDS_VTOBJPLG__VT_MENU__ABOUT_TITLE).c_str(),
+					string_loader.LoadStringW(IDS_VTMENU_ABOUT_BODY).c_str(),
+					string_loader.LoadStringW(IDS_VTMENU_ABOUT_TITLE).c_str(),
 					MB_ICONINFORMATION + MB_OK
 				);
 				break;
@@ -59,10 +59,10 @@ namespace vtobjplugin::VirtoolsMenu {
 		g_Plugininterface->ClearPluginMenu(g_MainMenu);
 
 		auto& string_loader = Utilities::StringLoader::GetSingleton();
-		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 0, string_loader.LoadStringA(IDS_VTOBJPLG__VT_MENU__MENU_EXPORT_OBJECTS).c_str());
+		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 0, string_loader.LoadStringA(IDS_VTMENU_MENU_EXPORT_OBJECTS).c_str());
 		g_Plugininterface->AddPluginMenuItem(g_MainMenu, -1, NULL, TRUE);
-		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 1, string_loader.LoadStringA(IDS_VTOBJPLG__VT_MENU__MENU_REPORT_BUG).c_str());
-		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 2, string_loader.LoadStringA(IDS_VTOBJPLG__VT_MENU__MENU_ABOUT).c_str());
+		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 1, string_loader.LoadStringA(IDS_VTMENU_MENU_REPORT_BUG).c_str());
+		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 2, string_loader.LoadStringA(IDS_VTMENU_MENU_ABOUT).c_str());
 
 
 		g_Plugininterface->UpdatePluginMenu(g_MainMenu);

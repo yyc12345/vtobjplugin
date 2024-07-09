@@ -153,13 +153,22 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_VTOBJPLG__VT_MENU__MENU_EXPORT_OBJECTS "导出物体"
-    IDS_VTOBJPLG__VT_MENU__MENU_REPORT_BUG "汇报错误"
-    IDS_VTOBJPLG__VT_MENU__MENU_ABOUT "关于 vtobjplugin"
-    IDS_VTOBJPLG__VT_MENU__ABOUT_TITLE "关于 vtobjplugin"
-    IDS_VTOBJPLG__VT_MENU__ABOUT_BODY 
-                            "vtobjplugin v3.0 - 适用于 Virtools 的 Wavefront OBJ 导出器。\n基于 GPL v3 许可证。\n项目主页: https://github.com/yyc12345/vtobjplugin"
-    IDS_VTOBJPLG__VT_MENU__SUCCESS_NOTE "Wavefront OBJ 导出完成。"
+    IDS_VTMENU_MENU_EXPORT_OBJECTS "导出物体"
+    IDS_VTMENU_MENU_REPORT_BUG "汇报错误"
+    IDS_VTMENU_MENU_ABOUT   "关于 vtobjplugin"
+    IDS_VTMENU_ABOUT_TITLE  "关于 vtobjplugin"
+    IDS_VTMENU_ABOUT_BODY   "vtobjplugin v3.0 - 适用于 Virtools 的 Wavefront OBJ 导出器。\n基于 GPL v3 许可证。\n项目主页: https://github.com/yyc12345/vtobjplugin"
+    IDS_VTMENU_SUCCESS_NOTE "Wavefront OBJ 导出完成。"
+    IDS_EXPSETDLG_ERR_TITLE "设置错误"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_EXPSETDLG_ERR_NO_ASSOC_ITEM "您必须指定一个导出目标！"
+    IDS_EXPSETDLG_ERR_NO_EXP_DIR "导出目录不能为空！"
+    IDS_EXPSETDLG_ERR_NO_TEX_FMT "自定义贴图格式不能为空！"
+    IDS_EXPSETDLG_ERR_INVALID_CP "无效的自定义编码！"
+    IDS_EXPSETDLG_ERR_EXP_DIR_NOT_EXIST "导出目录必须存在！"
 END
 
 #endif    // Chinese (Simplified) resources
@@ -347,13 +356,22 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_VTOBJPLG__VT_MENU__MENU_EXPORT_OBJECTS "Export Objects"
-    IDS_VTOBJPLG__VT_MENU__MENU_REPORT_BUG "Report Bug"
-    IDS_VTOBJPLG__VT_MENU__MENU_ABOUT "About vtobjplugin"
-    IDS_VTOBJPLG__VT_MENU__ABOUT_TITLE "About vtobjplugin"
-    IDS_VTOBJPLG__VT_MENU__ABOUT_BODY 
-                            "vtobjplugin v3.0 - A Wavefront OBJ Exporter for Virtools.\nUnder GPL v3 License.\nProject Home Page: https://github.com/yyc12345/vtobjplugin"
-    IDS_VTOBJPLG__VT_MENU__SUCCESS_NOTE "Wavefront OBJ Export Done."
+    IDS_VTMENU_MENU_EXPORT_OBJECTS "Export Objects"
+    IDS_VTMENU_MENU_REPORT_BUG "Report Bug"
+    IDS_VTMENU_MENU_ABOUT   "About vtobjplugin"
+    IDS_VTMENU_ABOUT_TITLE  "About vtobjplugin"
+    IDS_VTMENU_ABOUT_BODY   "vtobjplugin v3.0 - A Wavefront OBJ Exporter for Virtools.\nUnder GPL v3 License.\nProject Home Page: https://github.com/yyc12345/vtobjplugin"
+    IDS_VTMENU_SUCCESS_NOTE "Wavefront OBJ Export Done."
+    IDS_EXPSETDLG_ERR_TITLE "Setting Error"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_EXPSETDLG_ERR_NO_ASSOC_ITEM "You must specify an export target!"
+    IDS_EXPSETDLG_ERR_NO_EXP_DIR "Export directory should not be empty!"
+    IDS_EXPSETDLG_ERR_NO_TEX_FMT "Custom texture format should not be empty!"
+    IDS_EXPSETDLG_ERR_INVALID_CP "Invalid custom encoding!"
+    IDS_EXPSETDLG_ERR_EXP_DIR_NOT_EXIST "Export directory must be existed!"
 END
 
 #endif    // English (United States) resources

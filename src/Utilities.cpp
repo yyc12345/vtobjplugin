@@ -53,28 +53,14 @@ namespace vtobjplugin::Utilities {
 	}
 
 	void SetCWndText(CWnd* ctl, const YYCC::yycc_u8string_view& val) {
-		HWND hwnd = ctl->m_hWnd;
-		auto wval(YYCC::EncodingHelper::UTF8ToWchar(val));
-		SetWindowTextW(hwnd, wval.data());
+		ctl->SetWindowTextA(YYCC::EncodingHelper::UTF8ToChar(val, CP_ACP).c_str());
 	}
 
 	YYCC::yycc_u8string GetCWndText(CWnd* ctl) {
-		HWND hwnd = ctl->m_hWnd;
-		YYCC::yycc_u8string ret;
-		std::wstring wret;
-
-		// Ref: https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowtextlengthw
-		SetLastError(ERROR_SUCCESS);
-		int len = GetWindowTextLengthW(hwnd);
-		if (len == 0 && GetLastError() != ERROR_SUCCESS) 
-			return ret;
-
-		int copied = GetWindowTextW(hwnd, wret.data(), len);
-		if (len == 0 && GetLastError() != ERROR_SUCCESS) 
-			return ret;
-
-		ret = YYCC::EncodingHelper::WcharToUTF8(wret);
-		return ret;
+		// Ref: https://learn.microsoft.com/zh-cn/cpp/mfc/reference/cwnd-class?view=msvc-170#getwindowtext
+		CString recv;
+		ctl->GetWindowTextA(recv);
+		return YYCC::EncodingHelper::CharToUTF8((LPCSTR)recv, CP_ACP);
 	}
 
 	bool CheckDirectoryExistence(const YYCC::yycc_u8string_view& path) {

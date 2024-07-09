@@ -128,6 +128,8 @@ namespace vtobjplugin {
 
 	void ExportSettingDialog::OnBtnOkClicked() {
 		// ===== Validate input first =====
+		auto& string_loader = Utilities::StringLoader::GetSingleton();
+		std::wstring errmsg_title(string_loader.LoadStringW(IDS_EXPSETDLG_ERR_TITLE));
 		// selected associated export item
 		CK_ID associated_export_item = (CK_ID)0;
 		{
@@ -138,7 +140,7 @@ namespace vtobjplugin {
 					// get associated item
 					int selected_assoc_item_index = m_AssociatedExportItem.GetCurSel();
 					if (selected_assoc_item_index == CB_ERR) {
-						MessageBoxW(m_hWnd, L"You must specify an export target!", L"Setting Error", MB_OK + MB_ICONERROR);
+						MessageBoxW(m_hWnd, string_loader.LoadStringW(IDS_EXPSETDLG_ERR_NO_ASSOC_ITEM).c_str(), errmsg_title.c_str(), MB_OK + MB_ICONERROR);
 						return;
 					}
 					associated_export_item = m_AssocExportItemListCache[static_cast<size_t>(selected_assoc_item_index)];
@@ -155,11 +157,11 @@ namespace vtobjplugin {
 		{
 			export_directory = m_ExportDirectoryCache;
 			if (export_directory.empty()) {
-				MessageBoxW(m_hWnd, L"Export directory should not be empty!", L"Setting Error", MB_OK + MB_ICONERROR);
+				MessageBoxW(m_hWnd, string_loader.LoadStringW(IDS_EXPSETDLG_ERR_NO_EXP_DIR).c_str(), errmsg_title.c_str(), MB_OK + MB_ICONERROR);
 				return;
 			}
 			if (!Utilities::CheckDirectoryExistence(export_directory)) {
-				MessageBoxW(m_hWnd, L"Export directory must be existed!", L"Setting Error", MB_OK + MB_ICONERROR);
+				MessageBoxW(m_hWnd, string_loader.LoadStringW(IDS_EXPSETDLG_ERR_EXP_DIR_NOT_EXIST).c_str(), errmsg_title.c_str(), MB_OK + MB_ICONERROR);
 				return;
 			}
 		}
@@ -170,7 +172,7 @@ namespace vtobjplugin {
 			// only check custom texture format when it is enabled
 			if (RADIOBTN_GETCHECK(m_ExportMaterial) && RADIOBTN_GETCHECK(m_ExportTexture) && RADIOBTN_GETCHECK(m_UseCustomTextureFormat)) {
 				if (custom_texture_format.empty()) {
-					MessageBoxW(m_hWnd, L"Custom texture format should not be empty!", L"Setting Error", MB_OK + MB_ICONERROR);
+					MessageBoxW(m_hWnd, string_loader.LoadStringW(IDS_EXPSETDLG_ERR_NO_TEX_FMT).c_str(), errmsg_title.c_str(), MB_OK + MB_ICONERROR);
 					return;
 				}
 			}
@@ -180,10 +182,9 @@ namespace vtobjplugin {
 		{
 			// only check custom encoding when it is enabled
 			if (RADIOBTN_GETCHECK(m_CompositionEncoding_Custom)) {
-				YYCC::yycc_u8string custom_encoding_strl;
-				Utilities::GetCWndText(&m_CustomEncoding);
+				YYCC::yycc_u8string custom_encoding_strl(Utilities::GetCWndText(&m_CustomEncoding));
 				if (custom_encoding_strl.empty() || !YYCC::ParserHelper::TryParse<UINT>(custom_encoding_strl, custom_encoding) || !Utilities::ValidateCodePage(custom_encoding)) {
-					MessageBoxW(m_hWnd, L"Custom encoding is invalid!", L"Setting Error", MB_OK + MB_ICONERROR);
+					MessageBoxW(m_hWnd, string_loader.LoadStringW(IDS_EXPSETDLG_ERR_INVALID_CP).c_str(), errmsg_title.c_str(), MB_OK + MB_ICONERROR);
 					return;
 				}
 			}
@@ -486,9 +487,7 @@ namespace vtobjplugin {
 			else {
 				// if it is no name, generate a fallback name
 				YYCC::yycc_u8string u8_fallback_name(YYCC::StringHelper::Printf(YYCC_U8("[Unnamed Object] (CKID: %u)"), obj_array[i]->GetID()));
-				m_AssociatedExportItem.AddString(YYCC::EncodingHelper::CharToChar(
-					YYCC::EncodingHelper::ToOrdinary(u8_fallback_name), CP_UTF8, CP_ACP
-				).c_str());
+				m_AssociatedExportItem.AddString(YYCC::EncodingHelper::UTF8ToChar(u8_fallback_name, CP_ACP).c_str());
 			}
 		}
 	}
