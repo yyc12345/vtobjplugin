@@ -101,15 +101,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ConfigManager.cpp" />
+    <ClCompile Include="ExportLayoutWeaver.cpp" />
     <ClCompile Include="ExportSettingDialog.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ObjExporter.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="VirtoolsMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConfigManager.hpp" />
     <ClInclude Include="DataTypes.hpp" />
+    <ClInclude Include="ExportLayoutWeaver.hpp" />
     <ClInclude Include="ExportSettingDialog.hpp" />
+    <ClInclude Include="ObjExporter.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.hpp" />
     <ClInclude Include="Utilities.hpp" />

@@ -13,7 +13,8 @@ namespace vtobjplugin {
 		m_Context(ctx),
 		m_AssocExportItemListCache(),
 		m_ExportModeCache(DataTypes::ExportMode::All),
-		m_ExportDirectoryCache() {}
+		m_ExportDirectoryCache(),
+		m_ExportSettingResult() {}
 
 	ExportSettingDialog::~ExportSettingDialog() {}
 
@@ -248,6 +249,9 @@ namespace vtobjplugin {
 		SETTING_ASSIGNER(m_UseUTF8Script);
 #undef SETTING_ASSIGNER
 
+		// set to dialog result for caller getting
+		m_ExportSettingResult = export_setting;
+
 		CDialogEx::OnOK();
 	}
 
@@ -325,6 +329,14 @@ namespace vtobjplugin {
 
 	void ExportSettingDialog::OnBtnDisableHierarchyClicked() {
 		this->UpdateDisableHierarchy();
+	}
+
+#pragma endregion
+
+#pragma region Result Getter
+
+	const DataTypes::ExportSetting& ExportSettingDialog::GetExportSettingResult() {
+		return this->m_ExportSettingResult;
 	}
 
 #pragma endregion
