@@ -9,8 +9,8 @@ namespace vtobjplugin {
 		ObjExporter(
 			const DataTypes::ExportSetting& export_setting, 
 			const ExportLayoutWeaver& export_layout_weaver,
-			VirtoolsUIReporter ui_reporter);
-		~ObjExporter();
+			VirtoolsUIReporter ui_reporter) {}
+		~ObjExporter() {}
 
 	private:
 

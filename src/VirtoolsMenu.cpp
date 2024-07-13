@@ -2,6 +2,8 @@
 #include "VirtoolsMenu.hpp"
 #include "Utilities.hpp"
 #include "ExportSettingDialog.hpp"
+#include "ExportLayoutWeaver.hpp"
+#include "ObjExporter.hpp"
 #include <memory>
 
 namespace vtobjplugin::VirtoolsMenu {
@@ -17,10 +19,18 @@ namespace vtobjplugin::VirtoolsMenu {
 		switch (command_id) {
 			case 0:
 			{
+				// open export setting dialog
 				CKContext* ctx = g_Plugininterface->GetCKContext();
 				auto export_setting_dialog = std::make_unique<ExportSettingDialog>(ctx, nullptr);
 				if (export_setting_dialog->DoModal() != IDOK) break;
+				{
+					// build layout
+					const DataTypes::ExportSetting export_setting = export_setting_dialog->GetExportSettingResult();
+					ExportLayoutWeaver export_layout_weaver(g_Plugininterface, export_setting);
 
+					// todo: call final exporter
+					export_layout_weaver.GetFileList();
+				}
 				
 				auto success_note = string_loader.LoadStringA(IDS_VTMENU_SUCCESS_NOTE);
 				ctx->OutputToInfo(const_cast<CKSTRING>(success_note.c_str()));

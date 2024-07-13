@@ -31,6 +31,12 @@ namespace vtobjplugin {
 		afx_msg void OnBtnBrowseClicked();
 		afx_msg void OnBtnExportModeClicked();
 		afx_msg void OnBtnDisableHierarchyClicked();
+		
+		// ===== Result =====
+	public:
+		const DataTypes::ExportSetting& GetExportSettingResult();
+	protected:
+		DataTypes::ExportSetting m_ExportSettingResult;
 
 	protected:
 		// ===== Controls =====
@@ -70,9 +76,6 @@ namespace vtobjplugin {
 		std::vector<CK_ID> m_AssocExportItemListCache; ///< Storing displayed associated export items list because UI only display their names.
 		DataTypes::ExportMode m_ExportModeCache; ///< Storing current selected export mode for the convenience of detecting the change of export mode.
 		YYCC::yycc_u8string m_ExportDirectoryCache; ///< Storing picked export directory because UI can not handle worldwide characters.
-		// ===== Result =====
-		DataTypes::ExportSetting m_ExportSettingResult;
-		const DataTypes::ExportSetting& GetExportSettingResult();
 		// ===== Pull Push Functions =====
 		DataTypes::ExportMode PullExportMode();
 		void PushExportMode(DataTypes::ExportMode export_mode);
