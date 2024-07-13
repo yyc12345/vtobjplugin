@@ -122,7 +122,9 @@ namespace vtobjplugin {
 		m_PluginInterface(plugin_interface),
 		m_Context(plugin_interface->GetCKContext()),
 		m_ExportSetting(export_setting),
-		m_Reporter(m_Context) {}
+		m_Reporter(m_Context) {
+		WeaveLayout();
+	}
 
 	ExportLayoutWeaver::~ExportLayoutWeaver() {}
 
@@ -158,8 +160,7 @@ namespace vtobjplugin {
 			case DataTypes::ExportMode::Selected:
 			{
 				CKObjectArray* obj_array = m_PluginInterface->Get3dSelection();
-				int obj_count = obj_array->GetCount();
-				for (int i = 0; i < obj_count; ++i) {
+				for (obj_array->Reset(); !obj_array->EndOfList(); obj_array->Next()) {
 					// get object pointer
 					CKObject* obj = obj_array->GetData(m_Context);
 					// check object
@@ -273,7 +274,7 @@ namespace vtobjplugin {
 					// get material
 					CKMaterial* material = mesh->GetMaterial(i);
 					if (material == nullptr) continue;
-					if (file.m_MaterialMap.contains(material)) continue;
+					if (file.m_MaterialMap.find(material) != file.m_MaterialMap.end()) continue;
 					
 					// get name
 					YYCC::yycc_u8string ckobj_name(GetCKObjectName(material));
@@ -289,7 +290,7 @@ namespace vtobjplugin {
 				// get texture
 				CKTexture* texture = pair.first->GetTexture();
 				if (texture == nullptr) continue;
-				if (m_TextureMap.contains(texture)) continue;
+				if (m_TextureMap.find(texture) != m_TextureMap.end()) continue;
 
 				// extract file name part
 				std::filesystem::path texture_path(texture->GetSlotFileName(0));
