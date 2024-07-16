@@ -20,31 +20,7 @@ namespace vtobjplugin::DataTypes {
 	};
 
 	struct ExportSetting {
-		ExportSetting() :
-			m_ExportMode(ExportMode::All),
-			m_AssociatedExportItem((CK_ID)0),
-			m_FileMode(FileMode::OneFile),
-			m_ExportDirectory(YYCC_U8("")),
-
-			m_IgnoreTransform(true),
-			m_ConvertToRightHand(true),
-			m_UseNamePrefix(false),
-			m_ObjectSplitMode(ObjectSplitMode::Group),
-			m_EliminateNonAscii(false),
-
-			m_Generate3dsMaxScript(false),
-			m_GenerateBlenderScript(false),
-
-			m_ExportMaterial(true),
-			m_ExportTexture(true),
-			m_CopyTexture(false),
-			m_UseCustomTextureFormat(false),
-			m_CustomTextureFormat(YYCC_U8("bmp")),
-
-			m_CompositionEncoding(CompositionEncoding::System),
-			m_CustomEncoding(CP_ACP),
-			m_UseUTF8ObjMtl(false),
-			m_UseUTF8Script(false) {}
+		ExportSetting();
 
 		ExportMode m_ExportMode;
 		CK_ID m_AssociatedExportItem;
@@ -70,6 +46,22 @@ namespace vtobjplugin::DataTypes {
 		UINT m_CustomEncoding;
 		bool m_UseUTF8ObjMtl;
 		bool m_UseUTF8Script;
+
+		// ===== Assistant Functions =====
+		// These functions are used by exporter.
+		// Because these settings has complex hierarchy relation.
+		// It would be good to create some functions to get correct settings 
+		// according to the relation
+
+		bool CanGenerate3dsMaxScript() const;
+		bool CanGenerateBlenderScript() const;
+
+		bool CanExportMaterial() const;
+		bool CanExportTexture() const;
+		bool CanCopyTexture() const;
+		bool CanUseCustomTextureFormat() const;
+
+		UINT GetCompositionEncoding() const;
 	};
 
 }

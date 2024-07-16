@@ -18,6 +18,21 @@ namespace vtobjplugin::Utilities {
 		HINSTANCE m_Instance;
 	};
 
+	class VirtoolsUIReporter {
+	public:
+		VirtoolsUIReporter(CKContext* context);
+		~VirtoolsUIReporter();
+
+		void Write(const YYCC::yycc_char8_t* strl) const;
+		void Write(CKObject* associated_obj, const YYCC::yycc_char8_t* strl) const;
+		void Format(const YYCC::yycc_char8_t* fmt, ...) const;
+		void Format(CKObject* associated_obj, const YYCC::yycc_char8_t* fmt, ...) const;
+
+	private:
+		void RawWrite(const char* raw_strl) const;
+		CKContext* m_Context;
+	};
+
 #define RADIOBTN_GETCHECK(instance) (instance.GetCheck() == BST_CHECKED)
 #define RADIOBTN_SETCHECK(instance, stmt) (instance.SetCheck((stmt) ? BST_CHECKED : BST_UNCHECKED))
 

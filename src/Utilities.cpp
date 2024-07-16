@@ -46,6 +46,71 @@ namespace vtobjplugin::Utilities {
 
 #pragma endregion
 
+#pragma region Virtools UI Reporter
+
+	VirtoolsUIReporter::VirtoolsUIReporter(CKContext* context) :
+		m_Context(context) {}
+
+	VirtoolsUIReporter::~VirtoolsUIReporter() {}
+
+	void VirtoolsUIReporter::Write(const YYCC::yycc_char8_t* strl) const {
+		RawWrite(YYCC::EncodingHelper::UTF8ToChar(strl, CP_ACP).c_str());
+	}
+
+	void VirtoolsUIReporter::Write(CKObject* associated_obj, const YYCC::yycc_char8_t* strl) const {
+		std::string buffer;
+
+		// add associated object header
+		if (associated_obj != nullptr) {
+			// obj marker head
+			buffer += "[";
+
+			// object marker name part
+			CKSTRING assoc_obj_name = associated_obj->GetName();
+			if (assoc_obj_name != nullptr) {
+				buffer += assoc_obj_name;
+				buffer += " ";
+			}
+
+			// object marker id part
+			buffer += YYCC::EncodingHelper::UTF8ToChar(
+				YYCC::StringHelper::Printf(YYCC_U8("<ID: %>" PRIu32), associated_obj->GetID()),
+				CP_ACP
+			);
+
+			// obj marker tail
+			buffer += "] ";
+		}
+
+		// append real output data
+		buffer += YYCC::EncodingHelper::UTF8ToChar(strl, CP_ACP);
+		RawWrite(buffer.c_str());
+	}
+
+	void VirtoolsUIReporter::Format(const YYCC::yycc_char8_t* fmt, ...) const {
+		va_list argptr;
+		va_start(argptr, fmt);
+		this->Write(YYCC::StringHelper::VPrintf(fmt, argptr).c_str());
+		va_end(argptr);
+	}
+
+	void VirtoolsUIReporter::Format(CKObject* associated_obj, const YYCC::yycc_char8_t* fmt, ...) const {
+		va_list argptr;
+		va_start(argptr, fmt);
+		this->Write(associated_obj, YYCC::StringHelper::VPrintf(fmt, argptr).c_str());
+		va_end(argptr);
+	}
+
+	void VirtoolsUIReporter::RawWrite(const char* raw_strl) const {
+		if (m_Context != nullptr && raw_strl != nullptr) {
+			m_Context->OutputToConsole(
+				const_cast<CKSTRING>(raw_strl),
+				FALSE
+			);
+		}
+	}
+
+#pragma endregion
 
 	bool ValidateCodePage(UINT code_page) {
 		CPINFOEXW cpinfo;

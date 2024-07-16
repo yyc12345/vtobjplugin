@@ -6,81 +6,15 @@
 
 namespace vtobjplugin {
 
-#pragma region Virtools UI Reporter
-
-	VirtoolsUIReporter::VirtoolsUIReporter(CKContext* context) :
-		m_Context(context) {}
-
-	VirtoolsUIReporter::~VirtoolsUIReporter() {}
-
-	void VirtoolsUIReporter::Write(const YYCC::yycc_char8_t* strl) const {
-		RawWrite(YYCC::EncodingHelper::UTF8ToChar(strl, CP_ACP).c_str());
-	}
-
-	void VirtoolsUIReporter::Write(CKObject* associated_obj, const YYCC::yycc_char8_t* strl) const {
-		std::string buffer;
-
-		// add associated object header
-		if (associated_obj != nullptr) {
-			// obj marker head
-			buffer += "[";
-
-			// object marker name part
-			CKSTRING assoc_obj_name = associated_obj->GetName();
-			if (assoc_obj_name != nullptr) {
-				buffer += assoc_obj_name;
-				buffer += " ";
-			}
-
-			// object marker id part
-			buffer += YYCC::EncodingHelper::UTF8ToChar(
-				YYCC::StringHelper::Printf(YYCC_U8("<ID: %>" PRIu32), associated_obj->GetID()),
-				CP_ACP
-			);
-
-			// obj marker tail
-			buffer += "] ";
-		}
-
-		// append real output data
-		buffer += YYCC::EncodingHelper::UTF8ToChar(strl, CP_ACP);
-		RawWrite(buffer.c_str());
-	}
-
-	void VirtoolsUIReporter::Format(const YYCC::yycc_char8_t* fmt, ...) const {
-		va_list argptr;
-		va_start(argptr, fmt);
-		this->Write(YYCC::StringHelper::VPrintf(fmt, argptr).c_str());
-		va_end(argptr);
-	}
-
-	void VirtoolsUIReporter::Format(CKObject* associated_obj, const YYCC::yycc_char8_t* fmt, ...) const {
-		va_list argptr;
-		va_start(argptr, fmt);
-		this->Write(associated_obj, YYCC::StringHelper::VPrintf(fmt, argptr).c_str());
-		va_end(argptr);
-	}
-
-	void VirtoolsUIReporter::RawWrite(const char* raw_strl) const {
-		if (m_Context != nullptr && raw_strl != nullptr) {
-			m_Context->OutputToConsole(
-				const_cast<CKSTRING>(raw_strl),
-				FALSE
-			);
-		}
-	}
-
-#pragma endregion
-
 	class UniqueName {
 	public:
-		UniqueName(const VirtoolsUIReporter& reporter) :
+		UniqueName(const Utilities::VirtoolsUIReporter& reporter) :
 			m_NameSet(), m_Reporter(reporter) {}
 		~UniqueName() {}
 
 	private:
 		std::set<YYCC::yycc_u8string> m_NameSet;
-		const VirtoolsUIReporter& m_Reporter;
+		const Utilities::VirtoolsUIReporter& m_Reporter;
 	public:
 		/**
 		 * @brief Generate unique name from expected name.
@@ -118,13 +52,12 @@ namespace vtobjplugin {
 
 	ExportLayoutWeaver::ExportLayoutWeaver(
 		PluginInterface* plugin_interface,
-		const DataTypes::ExportSetting& export_setting) :
+		const DataTypes::ExportSetting& export_setting,
+		const Utilities::VirtoolsUIReporter& reporter) :
 		m_PluginInterface(plugin_interface),
 		m_Context(plugin_interface->GetCKContext()),
 		m_ExportSetting(export_setting),
-		m_Reporter(m_Context) {
-		WeaveLayout();
-	}
+		m_Reporter(reporter) {}
 
 	ExportLayoutWeaver::~ExportLayoutWeaver() {}
 
@@ -255,61 +188,86 @@ namespace vtobjplugin {
 				throw std::runtime_error("invalid file mode.");
 		}
 
-		// Fulfill material and texture data
-		for (auto& file : m_FileList) {
-			// material unique name
-			UniqueName material_name_set(m_Reporter);
+		// Fulfill material data if necessary
+		if (m_ExportSetting.CanExportMaterial()) {
+			for (auto& file : m_FileList) {
+				// material unique name
+				UniqueName material_name_set(m_Reporter);
 
-			// iterate object for every file entry
-			for (const auto& object_pair : file.m_ObjectList) {
-				// get mesh from 3d object
-				// if no associated mesh, skip this object.
-				CKMesh* mesh = object_pair.first->GetCurrentMesh();
-				if (mesh == nullptr) continue;
+				// iterate object for every file entry
+				for (const auto& object_pair : file.m_ObjectList) {
+					// get mesh from 3d object
+					CKMesh* mesh = object_pair.first->GetCurrentMesh();
+					if (mesh == nullptr) continue; // skip no associated mesh
+					if (mesh->GetFaceCount() == 0) continue; // skip zero face mesh
 
-				// extract used material from this mesh
-				// and give them an unique name.
-				int material_count = mesh->GetMaterialCount();
-				for (int i = 0; i < material_count; ++i) {
-					// get material
-					CKMaterial* material = mesh->GetMaterial(i);
-					if (material == nullptr) continue;
-					if (file.m_MaterialMap.find(material) != file.m_MaterialMap.end()) continue;
-					
-					// get name
-					YYCC::yycc_u8string ckobj_name(GetCKObjectName(material));
-					// correct name
-					CorrectObjectName(ckobj_name);
-					// insert to material map
-					file.m_MaterialMap.emplace(std::make_pair(material, std::move(ckobj_name)));
+					// extract used material from this mesh
+					// and give them an unique name.
+					int material_count = mesh->GetMaterialCount();
+					for (int i = 0; i < material_count; ++i) {
+						// get material
+						CKMaterial* material = mesh->GetMaterial(i);
+						if (material == nullptr) continue;
+						if (file.m_MaterialMap.find(material) != file.m_MaterialMap.end()) continue;
+
+						// get name
+						YYCC::yycc_u8string ckobj_name(GetCKObjectName(material));
+						// correct name
+						CorrectObjectName(ckobj_name);
+						// get unique name from expected name 
+						// and insert to material map
+						file.m_MaterialMap.emplace(
+							std::make_pair(material, material_name_set.GetName(ckobj_name))
+						);
+					}
 				}
 			}
+		}
 
-			// iterate material list and extract texture infomations
-			for (const auto& pair : file.m_MaterialMap) {
-				// get texture
-				CKTexture* texture = pair.first->GetTexture();
-				if (texture == nullptr) continue;
-				if (m_TextureMap.find(texture) != m_TextureMap.end()) continue;
+		// Fulfill texture data if necessary
+		if (m_ExportSetting.CanExportTexture()) {
+			// texture file unique file name
+			UniqueName texture_name_set(m_Reporter);
+			// iterate file list
+			for (const auto& file : m_FileList) {
+				// iterate material list and extract texture infomations
+				for (const auto& pair : file.m_MaterialMap) {
+					// get texture
+					CKTexture* texture = pair.first->GetTexture();
+					if (texture == nullptr) continue;
+					if (m_TextureMap.find(texture) != m_TextureMap.end()) continue;
+					if (texture->GetSlotFileName(0) == nullptr) continue;
 
-				// extract file name part
-				std::filesystem::path texture_path(texture->GetSlotFileName(0));
-				YYCC::yycc_u8string filename(YYCC::FsPathPatch::ToUTF8Path(texture_path.filename()));
+					// fetch associated texture path from virtools with given encoding
+					std::filesystem::path texture_path(YYCC::FsPathPatch::FromUTF8Path(
+						YYCC::EncodingHelper::CharToUTF8(texture->GetSlotFileName(0), m_ExportSetting.GetCompositionEncoding()).c_str()
+					));
+					// extract stem and extension part from given path
+					YYCC::yycc_u8string filename_stem(YYCC::FsPathPatch::ToUTF8Path(texture_path.stem())),
+						filename_extension(YYCC::FsPathPatch::ToUTF8Path(texture_path.extension()));
 
-				// add extra extensions
-				if (m_ExportSetting.m_UseCustomTextureFormat) {
-					filename += YYCC_U8(".");
-					filename += m_ExportSetting.m_CustomTextureFormat;
+					// correct stem part of given file.
+					// because file name also need to be written in mtl file
+					// so it also need to be corrected for object
+					CorrectObjectName(filename_stem);
+					CorrectPathName(filename_stem);
+
+					// get unique name of stem
+					YYCC::yycc_u8string filename = texture_name_set.GetName(filename_stem);
+
+					// add extra extensions accoridng whether use custom texture format
+					if (m_ExportSetting.CanUseCustomTextureFormat()) {
+						// use custom one
+						filename += YYCC_U8(".");
+						filename += m_ExportSetting.m_CustomTextureFormat;
+					} else {
+						// add old part
+						filename += filename_extension;
+					}
+
+					// insert to map
+					m_TextureMap.emplace(std::make_pair(texture, std::move(filename)));
 				}
-
-				// correct path name
-				// because file name also need to be written in mtl file
-				// so it also need to be corrected for object
-				CorrectObjectName(filename);
-				CorrectPathName(filename);
-
-				// insert to map
-				m_TextureMap.emplace(std::make_pair(texture, std::move(filename)));
 			}
 		}
 	}
@@ -326,10 +284,8 @@ namespace vtobjplugin {
 		CKSTRING ckobj_name = ckobj->GetName();
 		if (ckobj != nullptr) {
 			// use current name.
-			// get encoding
-			UINT encoding = m_ExportSetting.m_CompositionEncoding == DataTypes::CompositionEncoding::Custom ? m_ExportSetting.m_CustomEncoding : CP_ACP;
 			// if fail to convert encoding, fallback to use generated name.
-			if (!YYCC::EncodingHelper::CharToUTF8(ckobj_name, ret, encoding)) {
+			if (!YYCC::EncodingHelper::CharToUTF8(ckobj_name, ret, m_ExportSetting.GetCompositionEncoding())) {
 				m_Reporter.Write(ckobj, YYCC_U8("Fail to convert its name by given encoding. Use generated name instead."));
 				ret = GenerateCKObjectName(ckobj);
 			}

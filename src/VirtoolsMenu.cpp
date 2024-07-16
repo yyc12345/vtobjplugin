@@ -24,12 +24,16 @@ namespace vtobjplugin::VirtoolsMenu {
 				auto export_setting_dialog = std::make_unique<ExportSettingDialog>(ctx, nullptr);
 				if (export_setting_dialog->DoModal() != IDOK) break;
 				{
+					// create reporter
+					Utilities::VirtoolsUIReporter reporter(ctx);
 					// build layout
 					const DataTypes::ExportSetting export_setting = export_setting_dialog->GetExportSettingResult();
-					ExportLayoutWeaver export_layout_weaver(g_Plugininterface, export_setting);
+					ExportLayoutWeaver export_layout_weaver(g_Plugininterface, export_setting, reporter);
+					export_layout_weaver.WeaveLayout();
 
-					// todo: call final exporter
-					export_layout_weaver.GetFileList();
+					// call final exporter
+					ObjExporter obj_exporter(export_setting, export_layout_weaver, reporter);
+					obj_exporter.DoExport();
 				}
 				
 				auto success_note = string_loader.LoadStringA(IDS_VTMENU_SUCCESS_NOTE);

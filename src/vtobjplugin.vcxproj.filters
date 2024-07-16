@@ -36,6 +36,9 @@
     <ClCompile Include="ObjExporter.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="DataTypes.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.hpp">
