@@ -20,8 +20,7 @@ namespace vtobjplugin {
 		void ExportObjFile(const ExportLayoutWeaver::File_t& file);
 		void ExportMtlFile(const ExportLayoutWeaver::File_t& file);
 		void CopyTextureFile();
-		void Generate3dsMaxScriptFile();
-		void GenerateBlenderScriptFile();
+		void GenerateScriptFile();
 
 		// ===== Assistant Function =====
 	private:
