@@ -462,11 +462,13 @@ namespace vtobjplugin {
 
 		// ===== write script headers =====
 
-		// todo: improve 3ds max script feature that find object by name
 		// write 3ds maxscript header
 		if (max_writer.has_value()) {
-			max_writer->WriteLine(YYCC_U8("fn tryModify obj mat = ("));
-			max_writer->WriteLine(YYCC_U8("    try obj.transform = mat catch ()"));
+			max_writer->WriteLine(YYCC_U8("fn try_modify obj_name mat = ("));
+			max_writer->WriteLine(YYCC_U8("    try ("));
+			max_writer->WriteLine(YYCC_U8("        obj = getNodeByName obj_name exact:true ignoreCase:false"));
+			max_writer->WriteLine(YYCC_U8("        if obj != undefined then obj.transform = mat"));
+			max_writer->WriteLine(YYCC_U8("    ) catch ()"));
 			max_writer->WriteLine(YYCC_U8(")"));
 		}
 
@@ -493,7 +495,7 @@ namespace vtobjplugin {
 
 				// write to 3ds max script
 				if (max_writer.has_value()) {
-					max_writer->CriticalWriteLine(YYCC_U8("tryModify $%s (matrix3 [%f, %f, %f] [%f, %f, %f] [%f, %f, %f] [%f, %f, %f])"),
+					max_writer->CriticalWriteLine(YYCC_U8("try_modify \"%s\" (matrix3 [%f, %f, %f] [%f, %f, %f] [%f, %f, %f] [%f, %f, %f])"),
 						obj.second.c_str(),
 						mat[0][0], mat[0][2], mat[0][1],
 						mat[2][0], mat[2][2], mat[2][1],
