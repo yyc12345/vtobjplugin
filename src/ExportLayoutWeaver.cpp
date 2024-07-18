@@ -166,7 +166,8 @@ namespace vtobjplugin {
 					// build file name with extra correction
 					YYCC::yycc_u8string filename(object_pair.second);
 					CorrectPathName(filename);
-					file.m_FileName = filename;
+					file.m_ObjFileName = filename + YYCC_U8(".obj");
+					file.m_MtlFileName = filename + YYCC_U8(".mtl");
 					// add object into it.
 					file.m_ObjectList.emplace_back(object_pair);
 					// insert to list
@@ -178,7 +179,9 @@ namespace vtobjplugin {
 			{
 				// build single file data
 				File_t single_file;
-				single_file.m_FileName = YYCC_U8("all");
+				YYCC::yycc_u8string filename = YYCC_U8("all");
+				single_file.m_ObjFileName = filename + YYCC_U8(".obj");
+				single_file.m_MtlFileName = filename + YYCC_U8(".mtl");
 				single_file.m_ObjectList = object_pairs;
 				// insert to list
 				m_FileList.emplace_back(std::move(single_file));

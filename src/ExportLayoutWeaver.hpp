@@ -10,7 +10,8 @@ namespace vtobjplugin {
 	public:
 		using ObjectPair_t = std::pair<CK3dEntity*, YYCC::yycc_u8string>;
 		struct File_t {
-			YYCC::yycc_u8string m_FileName; ///< The name of this file. Do not include extension (.obj .mtl).
+			YYCC::yycc_u8string m_ObjFileName; ///< The name of OBJ file.
+			YYCC::yycc_u8string m_MtlFileName; ///< The name of MTL file.
 			std::deque<ObjectPair_t> m_ObjectList; ///< The 3d object list this file included.
 			std::map<CKMaterial*, YYCC::yycc_u8string> m_MaterialMap; ///< Key is CKMaterial pointer, value is material name.
 		};

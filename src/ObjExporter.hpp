@@ -24,11 +24,7 @@ namespace vtobjplugin {
 
 		// ===== Assistant Function =====
 	private:
-		enum class ObjMtlFile {
-			ObjFile, MtlFile
-		};
-		YYCC::yycc_u8string GetObjMtlFilePath(const YYCC::yycc_u8string_view& filename_stem, ObjMtlFile file_type);
-		YYCC::yycc_u8string GetOtherFilePath(const YYCC::yycc_u8string_view& filename);
+		YYCC::yycc_u8string GetExportFilePath(const YYCC::yycc_u8string_view& filename);
 	private:
 		const DataTypes::ExportSetting& m_ExportSetting;
 		const ExportLayoutWeaver& m_ExportLayoutWeaver;
