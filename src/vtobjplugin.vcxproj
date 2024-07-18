@@ -75,7 +75,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>$(ProjectDir)vtobjplugin.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(YYCC_PATH)\lib\$(Platform)\$(Configuration);$(VIRTOOLS_PATH)\Sdk\Lib;$(VIRTOOLS_PATH)\Sdk\Lib\Win32\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>VxMath.lib;DllEditor.lib;CK2.lib;InterfaceControls.lib;CKControls.lib;YYCCommonplace.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>VxMath.lib;DllEditor.lib;CK2.lib;InterfaceControls.lib;CKControls.lib;YYCCommonplace.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -100,7 +100,7 @@
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <ModuleDefinitionFile>$(ProjectDir)vtobjplugin.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>$(YYCC_PATH)\lib\$(Platform)\$(Configuration);$(VIRTOOLS_PATH)\Sdk\Lib;$(VIRTOOLS_PATH)\Sdk\Lib\Win32\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>VxMath.lib;DllEditor.lib;CK2.lib;InterfaceControls.lib;CKControls.lib;YYCCommonplace.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>VxMath.lib;DllEditor.lib;CK2.lib;InterfaceControls.lib;CKControls.lib;YYCCommonplace.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

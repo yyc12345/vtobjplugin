@@ -1,4 +1,5 @@
 #include "Utilities.hpp"
+#include <cmath>
 
 namespace vtobjplugin::Utilities {
 
@@ -131,7 +132,7 @@ namespace vtobjplugin::Utilities {
 	bool CheckDirectoryExistence(const YYCC::yycc_u8string_view& path) {
 		// convert path
 		std::wstring wpath;
-		if (!YYCC::EncodingHelper::UTF8ToWchar(path, wpath)) 
+		if (!YYCC::EncodingHelper::UTF8ToWchar(path, wpath))
 			return false;
 
 		// find directory
@@ -141,6 +142,25 @@ namespace vtobjplugin::Utilities {
 		FindClose(hFind);
 		if (!(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) return false;
 		return true;
+	}
+
+	void GetNormalTransformMatrix(const VxMatrix& object_transform, VxMatrix& result) {
+		VxMatrix cache;
+		Vx3DInverseMatrix44(cache, object_transform);
+		Vx3DTransposeMatrix(result, cache);
+	}
+
+	bool IsMirrorMatrix(const VxMatrix& mat) {
+		// copy it and set column 3 and row 3 to zero except the diagenol
+		VxMatrix cache = mat;
+		for (size_t i = 0; i < 4u; ++i) {
+			cache[3][i] = 0.0f;
+			cache[i][3] = 0.0f;
+		}
+		cache[3][3] = 1.0f;
+
+		// calc it determinant
+		return Vx3DMatrixDeterminant(cache) < 0.0f;
 	}
 
 }

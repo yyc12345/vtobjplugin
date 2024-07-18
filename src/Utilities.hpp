@@ -43,4 +43,7 @@ namespace vtobjplugin::Utilities {
 
 	bool CheckDirectoryExistence(const YYCC::yycc_u8string_view& path);
 
+	void GetNormalTransformMatrix(const VxMatrix& object_transform, VxMatrix& result);
+	bool IsMirrorMatrix(const VxMatrix& mat);
+
 }

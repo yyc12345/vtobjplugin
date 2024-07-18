@@ -118,7 +118,7 @@ namespace vtobjplugin {
 
 	static void CorrectFloat(float& f) {
 		// correction with sign
-		f = CORRECT_FLOAT(f, std::signbit(f) ? -1.0f : 1.0f);
+		f = CORRECT_FLOAT(f, std::copysign(1.0f, (f)));
 	}
 
 	static void CorrectFloat(VxVector& v) {
@@ -208,64 +208,59 @@ namespace vtobjplugin {
 			int vertex_count = mesh->GetVertexCount();
 			int face_count = mesh->GetFaceCount();
 
-			// get world matrix for following use
-			VxMatrix world_matrix = obj.first->GetWorldMatrix();
-
 			// write v statement
-			{
-				VxVector src_pos, transformed_pos;
-				for (int i = 0; i < vertex_count; ++i) {
-					// get source position
-					mesh->GetVertexPosition(i, &src_pos);
-					// multiply with world matrix if necessary
-					if (m_ExportSetting.m_IgnoreTransform) transformed_pos = src_pos;
-					else Vx3DMultiplyMatrixVector(&transformed_pos, world_matrix, &src_pos);
-					// correct position
-					CorrectFloat(transformed_pos);
-					// format into file with righthand option
-					writer.WriteLine(YYCC_U8("v %f %f %f"),
-						RIGHTHAND_POS_CONV(m_ExportSetting.m_ConvertToRightHand, transformed_pos.x, transformed_pos.y, transformed_pos.z)
-					);
-				}
+			VxVector src_pos, transformed_pos;
+			VxMatrix world_matrix = obj.first->GetWorldMatrix();
+			for (int i = 0; i < vertex_count; ++i) {
+				// get source position
+				mesh->GetVertexPosition(i, &src_pos);
+				// multiply with world matrix if necessary
+				if (m_ExportSetting.m_IgnoreTransform) transformed_pos = src_pos;
+				else Vx3DMultiplyMatrixVector(&transformed_pos, world_matrix, &src_pos);
+				// correct position
+				CorrectFloat(transformed_pos);
+				// format into file with righthand option
+				writer.WriteLine(YYCC_U8("v %f %f %f"),
+					RIGHTHAND_POS_CONV(m_ExportSetting.m_ConvertToRightHand, transformed_pos.x, transformed_pos.y, transformed_pos.z)
+				);
 			}
 
 			// write vt statement
-			{
-				float uv_u, uv_v;
-				for (int i = 0; i < vertex_count; ++i) {
-					// get vertex texture
-					mesh->GetVertexTextureCoordinates(i, &uv_u, &uv_v);
-					// correct uv
-					CorrectFloat(uv_u);
-					CorrectFloat(uv_v);
-					// format it into file with righthand option
-					writer.WriteLine(YYCC_U8("vt %f %f 0"),
-						RIGHTHAND_UV_CONV(m_ExportSetting.m_ConvertToRightHand, uv_u, uv_v)
-					);
-				}
+			float uv_u, uv_v;
+			for (int i = 0; i < vertex_count; ++i) {
+				// get vertex texture
+				mesh->GetVertexTextureCoordinates(i, &uv_u, &uv_v);
+				// correct uv
+				CorrectFloat(uv_u);
+				CorrectFloat(uv_v);
+				// format it into file with righthand option
+				writer.WriteLine(YYCC_U8("vt %f %f 0"),
+					RIGHTHAND_UV_CONV(m_ExportSetting.m_ConvertToRightHand, uv_u, uv_v)
+				);
 			}
 
 			// write vn statement
-			{
-				VxVector src_nml, transformed_nml;
-				for (int i = 0; i < vertex_count; ++i) {
-					// get source normal
-					mesh->GetVertexNormal(i, &src_nml);
-					// process with world matrix if necessary
-					if (m_ExportSetting.m_IgnoreTransform) transformed_nml = src_nml;
-					else {
-						// todo: finish normal transformation
-						// this implementation is wrong
-						Vx3DMultiplyMatrixVector(&transformed_nml, world_matrix, &src_nml);
-					}
-					// normalize it and correct position
-					transformed_nml.Normalize();
-					CorrectFloat(transformed_nml);
-					// format into file with righthand option
-					writer.WriteLine(YYCC_U8("vn %f %f %f"),
-						RIGHTHAND_POS_CONV(m_ExportSetting.m_ConvertToRightHand, transformed_nml.x, transformed_nml.y, transformed_nml.z)
-					);
+			// prepare variables
+			VxVector src_nml, transformed_nml;
+			// prepare normal used transform matrix
+			VxMatrix normal_matrix;
+			Utilities::GetNormalTransformMatrix(world_matrix, normal_matrix);
+			for (int i = 0; i < vertex_count; ++i) {
+				// get source normal
+				mesh->GetVertexNormal(i, &src_nml);
+				// process with world matrix if necessary
+				if (m_ExportSetting.m_IgnoreTransform) transformed_nml = src_nml;
+				else {
+					// this implementation is wrong
+					Vx3DMultiplyMatrixVector(&transformed_nml, normal_matrix, &src_nml);
 				}
+				// normalize it and correct position
+				transformed_nml.Normalize();
+				CorrectFloat(transformed_nml);
+				// format into file with righthand option
+				writer.WriteLine(YYCC_U8("vn %f %f %f"),
+					RIGHTHAND_POS_CONV(m_ExportSetting.m_ConvertToRightHand, transformed_nml.x, transformed_nml.y, transformed_nml.z)
+				);
 			}
 
 			// write g or o statement to split object
@@ -281,46 +276,56 @@ namespace vtobjplugin {
 			}
 
 			// f and usemtl statement.
-			{
-				CKMaterial* prev_mtl = nullptr;
-				auto* face_indices = mesh->GetFacesIndices();
-				for (int i = 0; i < face_count; ++i) {
-					// usemtl statement
-					if (m_ExportSetting.CanExportMaterial()) {
-						// if current face material is not equal to previous face material
-						// we need to use "usemtl" statement to switch it.
-						CKMaterial* this_mtl = mesh->GetFaceMaterial(i);
-						if (this_mtl != prev_mtl) {
-							// if this face do not have material, we need write usemtl off
-							// otherwise try to fetching material name
-							if (this_mtl == nullptr) {
-								writer.WriteLine(YYCC_U8("usemtl off"));
-							} else {
-								auto material_finder = file.m_MaterialMap.find(this_mtl);
-								if (material_finder != file.m_MaterialMap.end()) {
-									writer.CriticalWriteLine(YYCC_U8("usemtl %s"), material_finder->second.c_str());
-								}
+			// prepare variables
+			CKMaterial* prev_mtl = nullptr;
+			auto* face_indices = mesh->GetFacesIndices();
+			// decide whether flip vertex indices
+			bool flip_vertex_indices;
+			if (m_ExportSetting.m_IgnoreTransform) {
+				// if we need apply world matrix to mesh,
+				// we need considering whether world matrix is mirror matrix.
+				flip_vertex_indices = m_ExportSetting.m_ConvertToRightHand ^ Utilities::IsMirrorMatrix(world_matrix);
+			} else {
+				// if no need to apply matrix,
+				// we can directly use the option of right hand convertion
+				flip_vertex_indices = m_ExportSetting.m_ConvertToRightHand;
+			}
+			for (int i = 0; i < face_count; ++i) {
+				// usemtl statement
+				if (m_ExportSetting.CanExportMaterial()) {
+					// if current face material is not equal to previous face material
+					// we need to use "usemtl" statement to switch it.
+					CKMaterial* this_mtl = mesh->GetFaceMaterial(i);
+					if (this_mtl != prev_mtl) {
+						// if this face do not have material, we need write usemtl off
+						// otherwise try to fetching material name
+						if (this_mtl == nullptr) {
+							writer.WriteLine(YYCC_U8("usemtl off"));
+						} else {
+							auto material_finder = file.m_MaterialMap.find(this_mtl);
+							if (material_finder != file.m_MaterialMap.end()) {
+								writer.CriticalWriteLine(YYCC_U8("usemtl %s"), material_finder->second.c_str());
 							}
-							// update previous face material as this face material for next face.
-							prev_mtl = this_mtl;
 						}
+						// update previous face material as this face material for next face.
+						prev_mtl = this_mtl;
 					}
-
-					// f statement
-					// prepare point index
-					uint64_t p1 = static_cast<uint64_t>(face_indices[i * 3]) + UINT64_C(1) + vertex_counter,
-						p2 = static_cast<uint64_t>(face_indices[i * 3 + 1]) + UINT64_C(1) + vertex_counter,
-						p3 = static_cast<uint64_t>(face_indices[i * 3 + 2]) + UINT64_C(1) + vertex_counter;
-					// write into file considering right hand
-					writer.WriteLine(
-						YYCC_U8("f %" PRIu64 "/%" PRIu64 "/%" PRIu64 " %" PRIu64 "/%" PRIu64 "/%" PRIu64 " %" PRIu64 "/%" PRIu64 "/%" PRIu64 ""),
-						RIGHTHAND_FACE_CONV(m_ExportSetting.m_ConvertToRightHand, p1, p2, p3)
-					);
 				}
 
-				// accumulate vector counter
-				vertex_counter += static_cast<uint64_t>(vertex_count);
+				// f statement
+				// prepare point index
+				uint64_t p1 = static_cast<uint64_t>(face_indices[i * 3]) + UINT64_C(1) + vertex_counter,
+					p2 = static_cast<uint64_t>(face_indices[i * 3 + 1]) + UINT64_C(1) + vertex_counter,
+					p3 = static_cast<uint64_t>(face_indices[i * 3 + 2]) + UINT64_C(1) + vertex_counter;
+				// write into file considering right hand
+				writer.WriteLine(
+					YYCC_U8("f %" PRIu64 "/%" PRIu64 "/%" PRIu64 " %" PRIu64 "/%" PRIu64 "/%" PRIu64 " %" PRIu64 "/%" PRIu64 "/%" PRIu64 ""),
+					RIGHTHAND_FACE_CONV(flip_vertex_indices, p1, p2, p3)
+				);
 			}
+
+			// accumulate vector counter
+			vertex_counter += static_cast<uint64_t>(vertex_count);
 		}
 
 		//undef useful macros
