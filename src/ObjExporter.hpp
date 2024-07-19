@@ -29,6 +29,7 @@ namespace vtobjplugin {
 		const DataTypes::ExportSetting& m_ExportSetting;
 		const ExportLayoutWeaver& m_ExportLayoutWeaver;
 		const Utilities::VirtoolsUIReporter m_Reporter;
+		const Utilities::StringLoader& m_StringLoader;
 	};
 
 }

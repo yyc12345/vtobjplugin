@@ -169,6 +169,23 @@ BEGIN
     IDS_EXPSETDLG_ERR_NO_TEX_FMT "自定义贴图格式不能为空！"
     IDS_EXPSETDLG_ERR_INVALID_CP "无效的自定义编码！"
     IDS_EXPSETDLG_ERR_EXP_DIR_NOT_EXIST "导出目录必须存在！"
+    IDS_OBJEXP_ERR_OBJ      "无法创建 OBJ 文件: ""%s""。"
+    IDS_OBJEXP_ERR_MTL      "无法创建 MTL 文件: ""%s""。"
+    IDS_OBJEXP_ERR_MAX_SCRIPT "无法创建 3ds Max 脚本文件: ""%s""。"
+    IDS_OBJEXP_ERR_BLD_SCRIPT "无法创建 Blender 脚本文件: ""%s""。"
+    IDS_OBJEXP_ERR_TEMP_DIR "无法获取 Windows 临时路径，因此无法复制贴图。"
+    IDS_OBJEXP_ERR_TEMP_TEX "无法获取临时贴图目录: ""%s""。跳过此贴图的复制。"
+    IDS_OBJEXP_ERR_TEX      "无法获取贴图目录: ""%s""。跳过此贴图的复制。"
+    IDS_UNAME_RENAME        "由于名称唯一性，名称 ""%s"" 已被重命名为 ""%s""。"
+    IDS_EXPLAYOUT_OBJ_NO_MESH "3D 物体不包含网格。跳过导出。"
+    IDS_EXPLAYOUT_MESH_NO_FACE "关联的网格不含有任何面。跳过导出。"
+    IDS_EXPLAYOUT_TEX_NO_SLOT_FNAME "贴图插槽中没有文件名称。跳过导出。"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_EXPLAYOUT_NAME_CONV_FAIL "无法以给定编码转换其名称。因此使用生成的名称替代。"
+    IDS_EXPLAYOUT_NAME_UNAMED "未命名物体。使用生成的名称。"
 END
 
 #endif    // Chinese (Simplified) resources
@@ -373,6 +390,26 @@ BEGIN
     IDS_EXPSETDLG_ERR_NO_TEX_FMT "Custom texture format should not be empty!"
     IDS_EXPSETDLG_ERR_INVALID_CP "Invalid custom encoding!"
     IDS_EXPSETDLG_ERR_EXP_DIR_NOT_EXIST "Export directory must be existed!"
+    IDS_OBJEXP_ERR_OBJ      "Fail to create OBJ file: ""%s""."
+    IDS_OBJEXP_ERR_MTL      "Fail to create MTL file: ""%s""."
+    IDS_OBJEXP_ERR_MAX_SCRIPT "Fail to create 3ds Max script file: ""%s""."
+    IDS_OBJEXP_ERR_BLD_SCRIPT "Fail to create Blender script file: ""%s""."
+    IDS_OBJEXP_ERR_TEMP_DIR "Fail to get Windows temp path, thus we can not copy texture."
+    IDS_OBJEXP_ERR_TEMP_TEX "Fail to get temporary texture path: ""%s"". Skip copying this texture."
+    IDS_OBJEXP_ERR_TEX      "Fail to get texture path: ""%s"". Skip copying this texture."
+    IDS_UNAME_RENAME        "Name ""%s"" was renamed to ""%s"" for unique name."
+    IDS_EXPLAYOUT_OBJ_NO_MESH "3D Object doesn't have mesh. Skip exporting."
+    IDS_EXPLAYOUT_MESH_NO_FACE 
+                            "Associated mesh doesn't have any faces. Skip exporting."
+    IDS_EXPLAYOUT_TEX_NO_SLOT_FNAME 
+                            "No file name in texture slot. Skip exporting."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_EXPLAYOUT_NAME_CONV_FAIL 
+                            "Fail to convert its name by given encoding. Use generated name instead."
+    IDS_EXPLAYOUT_NAME_UNAMED "Unamed object. Use generated name."
 END
 
 #endif    // English (United States) resources

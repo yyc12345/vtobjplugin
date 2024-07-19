@@ -14,7 +14,7 @@ namespace vtobjplugin::VirtoolsMenu {
 
 	static void PluginMenuCallback(int command_id) {
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
-		auto& string_loader = Utilities::StringLoader::GetSingleton();
+		const auto& string_loader = Utilities::StringLoader::GetSingleton();
 
 		switch (command_id) {
 			case 0:
@@ -72,7 +72,7 @@ namespace vtobjplugin::VirtoolsMenu {
 	static void UpdateMenu() {
 		g_Plugininterface->ClearPluginMenu(g_MainMenu);
 
-		auto& string_loader = Utilities::StringLoader::GetSingleton();
+		const auto& string_loader = Utilities::StringLoader::GetSingleton();
 		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 0, string_loader.LoadStringA(IDS_VTMENU_MENU_EXPORT_OBJECTS).c_str());
 		g_Plugininterface->AddPluginMenuItem(g_MainMenu, -1, NULL, TRUE);
 		g_Plugininterface->AddPluginMenuItem(g_MainMenu, 1, string_loader.LoadStringA(IDS_VTMENU_MENU_REPORT_BUG).c_str());

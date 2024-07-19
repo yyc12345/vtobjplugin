@@ -5,16 +5,16 @@ namespace vtobjplugin::Utilities {
 
 	class StringLoader {
 	public:
-		static StringLoader& GetSingleton();
+		static const StringLoader& GetSingleton();
 	private:
 		StringLoader();
 
 	public:
-		std::wstring LoadStringW(UINT uID, const wchar_t* fallback = L"");
-		std::string LoadStringA(UINT uID, const char* fallback = "");
-		YYCC::yycc_u8string LoadStringU8(UINT uID, const YYCC::yycc_char8_t* fallback = YYCC_U8(""));
+		std::wstring LoadStringW(UINT uID, const wchar_t* fallback = L"") const;
+		std::string LoadStringA(UINT uID, const char* fallback = "") const;
+		YYCC::yycc_u8string LoadStringU8(UINT uID, const YYCC::yycc_char8_t* fallback = YYCC_U8("")) const;
 	private:
-		bool InternalLoadString(UINT uID, std::wstring& dst);
+		bool InternalLoadString(UINT uID, std::wstring& dst) const;
 		HINSTANCE m_Instance;
 	};
 

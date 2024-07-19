@@ -5,7 +5,7 @@ namespace vtobjplugin::Utilities {
 
 #pragma region String Loader
 
-	StringLoader& StringLoader::GetSingleton() {
+	const StringLoader& StringLoader::GetSingleton() {
 		static StringLoader g_Singleton;
 		return g_Singleton;
 	}
@@ -13,14 +13,14 @@ namespace vtobjplugin::Utilities {
 	StringLoader::StringLoader() :
 		m_Instance(YYCC::WinFctHelper::GetCurrentModule()) {}
 
-	std::wstring StringLoader::LoadStringW(UINT uID, const wchar_t* fallback) {
+	std::wstring StringLoader::LoadStringW(UINT uID, const wchar_t* fallback) const {
 		std::wstring ret;
 		if (!InternalLoadString(uID, ret))
 			ret = (fallback == nullptr ? L"" : fallback);
 		return ret;
 	}
 
-	std::string StringLoader::LoadStringA(UINT uID, const char* fallback) {
+	std::string StringLoader::LoadStringA(UINT uID, const char* fallback) const {
 		std::wstring wret;
 		std::string ret;
 		if (!InternalLoadString(uID, wret) || !YYCC::EncodingHelper::WcharToChar(wret, ret, CP_ACP))
@@ -28,7 +28,7 @@ namespace vtobjplugin::Utilities {
 		return ret;
 	}
 
-	YYCC::yycc_u8string StringLoader::LoadStringU8(UINT uID, const YYCC::yycc_char8_t* fallback) {
+	YYCC::yycc_u8string StringLoader::LoadStringU8(UINT uID, const YYCC::yycc_char8_t* fallback) const {
 		std::wstring wret;
 		YYCC::yycc_u8string ret;
 		if (!InternalLoadString(uID, wret) || !YYCC::EncodingHelper::WcharToUTF8(wret, ret))
@@ -36,7 +36,7 @@ namespace vtobjplugin::Utilities {
 		return ret;
 	}
 
-	bool StringLoader::InternalLoadString(UINT uID, std::wstring& dst) {
+	bool StringLoader::InternalLoadString(UINT uID, std::wstring& dst) const {
 		wchar_t* str_ptr = nullptr;
 		int str_length = ::LoadStringW(m_Instance, uID, reinterpret_cast<LPWSTR>(&str_ptr), 0);
 		if (str_length == 0) return false;

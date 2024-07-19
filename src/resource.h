@@ -15,6 +15,20 @@
 #define IDS_EXPSETDLG_ERR_NO_TEX_FMT    114
 #define IDS_EXPSETDLG_ERR_INVALID_CP    115
 #define IDS_EXPSETDLG_ERR_EXP_DIR_NOT_EXIST 116
+#define IDS_OBJEXP_ERR_OBJ              117
+#define IDS_OBJEXP_ERR_MTL              118
+#define IDS_OBJEXP_ERR_MAX_SCRIPT       119
+#define IDS_OBJEXP_ERR_BLD_SCRIPT       120
+#define IDS_OBJEXP_ERR_TEMP_DIR         121
+#define IDS_OBJEXP_ERR_TEMP_TEX         122
+#define IDS_OBJEXP_ERR_TEX              123
+#define IDS_UNAME_RENAME                124
+#define IDS_EXPLAYOUT_OBJ_NO_MESH       125
+#define IDS_EXPLAYOUT_MESH_NO_FACE      126
+#define IDS_EXPLAYOUT_TEX_NO_SLOT_FNAME 127
+#define IDS_EXPLAYOUT_NAME_CONV_FAIL    128
+#define IDS_EXPALYOUT_NAME_UNAMED       129
+#define IDS_EXPLAYOUT_NAME_UNAMED       129
 #define IDC_RADIO1                      1001
 #define IDC_RADIO2                      1002
 #define IDC_RADIO3                      1003
@@ -48,7 +62,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        117
+#define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1032
 #define _APS_NEXT_SYMED_VALUE           101

@@ -12,8 +12,18 @@ namespace vtobjplugin {
 		struct File_t {
 			YYCC::yycc_u8string m_ObjFileName; ///< The name of OBJ file.
 			YYCC::yycc_u8string m_MtlFileName; ///< The name of MTL file.
-			std::deque<ObjectPair_t> m_ObjectList; ///< The 3d object list this file included.
-			std::map<CKMaterial*, YYCC::yycc_u8string> m_MaterialMap; ///< Key is CKMaterial pointer, value is material name.
+			/**
+			 * The 3d object list this file included.
+			 * Every 3d object item must have a valid associated mesh (not nullptr)
+			 * and this mesh must have at least 1 face.
+			*/
+			std::deque<ObjectPair_t> m_ObjectList;
+			/**
+			 * The dictionary of materials and its name which is used by the mesh associating with 3d object in object list
+			 * Key is CKMaterial pointer, value is material name.
+			 * Every material pointer in pair must be valid (not nullptr)
+			*/
+			std::map<CKMaterial*, YYCC::yycc_u8string> m_MaterialMap;
 		};
 	public:
 		ExportLayoutWeaver(
@@ -32,7 +42,13 @@ namespace vtobjplugin {
 		void DistributeObject(const std::deque<ObjectPair_t>& object_pairs);
 	private:
 		std::deque<File_t> m_FileList; ///< The export list splitted by individual file
-		std::map<CKTexture*, YYCC::yycc_u8string> m_TextureMap; ///< Key is CKTexture pointer, value is texture file name including extensions.
+		/**
+		 * The dictionary recoding all textures used by all exported files.
+		 * Key is CKTexture pointer, value is texture file name including extensions.
+		 * Every texture must be valid (not nullptr) in pair.
+		 * And this texture must have a valid file name in slot 0.
+		*/
+		std::map<CKTexture*, YYCC::yycc_u8string> m_TextureMap;
 
 		// ===== Assistant Functions =====
 	private:
@@ -44,6 +60,7 @@ namespace vtobjplugin {
 		CKContext* m_Context;
 		const DataTypes::ExportSetting& m_ExportSetting;
 		const Utilities::VirtoolsUIReporter& m_Reporter;
+		const Utilities::StringLoader& m_StringLoader;
 	};
 
 }

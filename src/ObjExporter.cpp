@@ -156,7 +156,8 @@ namespace vtobjplugin {
 		const Utilities::VirtoolsUIReporter reporter) :
 		m_ExportSetting(export_setting),
 		m_ExportLayoutWeaver(export_layout_weaver),
-		m_Reporter(reporter) {}
+		m_Reporter(reporter),
+		m_StringLoader(Utilities::StringLoader::GetSingleton()) {}
 
 	ObjExporter::~ObjExporter() {}
 
@@ -180,7 +181,7 @@ namespace vtobjplugin {
 		TextFileWriter::Encoding obj_encoding = m_ExportSetting.m_UseUTF8ObjMtl ? TextFileWriter::Encoding::UTF8 : TextFileWriter::Encoding::System;
 		TextFileWriter writer(obj_filepath.c_str(), obj_encoding);
 		if (!writer.CanWrite()) {
-			m_Reporter.Format(YYCC_U8("Fail to create OBJ file: \"%s\""), obj_filepath.c_str());
+			m_Reporter.Format(m_StringLoader.LoadStringU8(IDS_OBJEXP_ERR_OBJ).c_str(), obj_filepath.c_str());
 			return;
 		}
 
@@ -294,9 +295,10 @@ namespace vtobjplugin {
 				// usemtl statement
 				if (m_ExportSetting.CanExportMaterial()) {
 					// if current face material is not equal to previous face material
+					// or it is the first face,
 					// we need to use "usemtl" statement to switch it.
 					CKMaterial* this_mtl = mesh->GetFaceMaterial(i);
-					if (this_mtl != prev_mtl) {
+					if (this_mtl != prev_mtl || i == 0) {
 						// if this face do not have material, we need write usemtl off
 						// otherwise try to fetching material name
 						if (this_mtl == nullptr) {
@@ -343,7 +345,7 @@ namespace vtobjplugin {
 		TextFileWriter::Encoding mtl_encoding = m_ExportSetting.m_UseUTF8ObjMtl ? TextFileWriter::Encoding::UTF8 : TextFileWriter::Encoding::System;
 		TextFileWriter writer(mtl_filepath.c_str(), mtl_encoding);
 		if (!writer.CanWrite()) {
-			m_Reporter.Format(YYCC_U8("Fail to create MTL file: \"%s\""), mtl_filepath.c_str());
+			m_Reporter.Format(m_StringLoader.LoadStringU8(IDS_OBJEXP_ERR_MTL).c_str(), mtl_filepath.c_str());
 			return;
 		}
 
@@ -389,7 +391,7 @@ namespace vtobjplugin {
 		// get windows temp directory
 		YYCC::yycc_u8string u8_temp_directory;
 		if (!YYCC::WinFctHelper::GetTempDirectory(u8_temp_directory)) {
-			m_Reporter.Write(YYCC_U8("Fail to get Windows temp path, thus we can not copy texture."));
+			m_Reporter.Write(m_StringLoader.LoadStringU8(IDS_OBJEXP_ERR_TEMP_DIR).c_str());
 			return;
 		}
 		std::filesystem::path temp_directory(YYCC::FsPathPatch::FromUTF8Path(u8_temp_directory.c_str()));
@@ -409,7 +411,7 @@ namespace vtobjplugin {
 			std::wstring w_temp_file;
 			if (!YYCC::EncodingHelper::UTF8ToChar(u8_temp_file, acp_temp_file, CP_ACP) ||
 				!YYCC::EncodingHelper::UTF8ToWchar(u8_temp_file, w_temp_file)) {
-				m_Reporter.Format(YYCC_U8("Fail to get temporary texture path: \"%s\". Skip texture copy."), u8_temp_file.c_str());
+				m_Reporter.Format(m_StringLoader.LoadStringU8(IDS_OBJEXP_ERR_TEMP_TEX).c_str(), u8_temp_file.c_str());
 				continue;
 			}
 
@@ -417,7 +419,7 @@ namespace vtobjplugin {
 			auto u8_dest_file = GetExportFilePath(texture.second);
 			std::wstring w_dest_file;
 			if (!YYCC::EncodingHelper::UTF8ToWchar(u8_dest_file, w_dest_file)) {
-				m_Reporter.Format(YYCC_U8("Fail to get texture path: \"%s\". Skip texture copy."), u8_dest_file.c_str());
+				m_Reporter.Format(m_StringLoader.LoadStringU8(IDS_OBJEXP_ERR_TEX).c_str(), u8_dest_file.c_str());
 				continue;
 			}
 
@@ -446,7 +448,7 @@ namespace vtobjplugin {
 			// get writer
 			max_writer = std::make_optional<TextFileWriter>(filepath.c_str(), encoding);
 			if (!max_writer->CanWrite()) {
-				m_Reporter.Format(YYCC_U8("Fail to create 3ds Max script file: \"%s\""), filepath.c_str());
+				m_Reporter.Format(m_StringLoader.LoadStringU8(IDS_OBJEXP_ERR_MAX_SCRIPT).c_str(), filepath.c_str());
 				max_writer.reset();
 			}
 		}
@@ -460,7 +462,7 @@ namespace vtobjplugin {
 			// get writer
 			bld_writer = std::make_optional<TextFileWriter>(filepath.c_str(), encoding);
 			if (!bld_writer->CanWrite()) {
-				m_Reporter.Format(YYCC_U8("Fail to create Blender script file: \"%s\""), filepath.c_str());
+				m_Reporter.Format(m_StringLoader.LoadStringU8(IDS_OBJEXP_ERR_BLD_SCRIPT).c_str(), filepath.c_str());
 				bld_writer.reset();
 			}
 		}

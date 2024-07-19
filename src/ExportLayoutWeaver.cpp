@@ -9,12 +9,14 @@ namespace vtobjplugin {
 	class UniqueName {
 	public:
 		UniqueName(const Utilities::VirtoolsUIReporter& reporter) :
-			m_NameSet(), m_Reporter(reporter) {}
+			m_NameSet(), m_Reporter(reporter),
+			m_StringLoader(Utilities::StringLoader::GetSingleton()) {}
 		~UniqueName() {}
 
 	private:
 		std::set<YYCC::yycc_u8string> m_NameSet;
 		const Utilities::VirtoolsUIReporter& m_Reporter;
+		const Utilities::StringLoader& m_StringLoader;
 	public:
 		/**
 		 * @brief Generate unique name from expected name.
@@ -43,7 +45,7 @@ namespace vtobjplugin {
 				if (result.second) break;
 			}
 			// indicate final name is different with expected name
-			m_Reporter.Format(YYCC_U8("Name \"%s\" was renamed to \"%s\" for unique name."), expected_name.c_str(), ret.c_str());
+			m_Reporter.Format(m_StringLoader.LoadStringU8(IDS_UNAME_RENAME).c_str(), expected_name.c_str(), ret.c_str());
 			return ret;
 		}
 	};
@@ -57,7 +59,8 @@ namespace vtobjplugin {
 		m_PluginInterface(plugin_interface),
 		m_Context(plugin_interface->GetCKContext()),
 		m_ExportSetting(export_setting),
-		m_Reporter(reporter) {}
+		m_Reporter(reporter),
+		m_StringLoader(Utilities::StringLoader::GetSingleton()) {}
 
 	ExportLayoutWeaver::~ExportLayoutWeaver() {}
 
@@ -199,10 +202,16 @@ namespace vtobjplugin {
 
 				// iterate object for every file entry
 				for (const auto& object_pair : file.m_ObjectList) {
-					// get mesh from 3d object
+					// get mesh from 3d object and validate it.
 					CKMesh* mesh = object_pair.first->GetCurrentMesh();
-					if (mesh == nullptr) continue; // skip no associated mesh
-					if (mesh->GetFaceCount() == 0) continue; // skip zero face mesh
+					if (mesh == nullptr) { // skip no associated mesh
+						m_Reporter.Write(object_pair.first, m_StringLoader.LoadStringU8(IDS_EXPLAYOUT_OBJ_NO_MESH).c_str());
+						continue;
+					}
+					if (mesh->GetFaceCount() == 0) { // skip zero face mesh
+						m_Reporter.Write(object_pair.first, m_StringLoader.LoadStringU8(IDS_EXPLAYOUT_MESH_NO_FACE).c_str());
+						continue;
+					}
 
 					// extract used material from this mesh
 					// and give them an unique name.
@@ -235,11 +244,14 @@ namespace vtobjplugin {
 			for (const auto& file : m_FileList) {
 				// iterate material list and extract texture infomations
 				for (const auto& pair : file.m_MaterialMap) {
-					// get texture
+					// get texture and validate it.
 					CKTexture* texture = pair.first->GetTexture();
 					if (texture == nullptr) continue;
 					if (m_TextureMap.find(texture) != m_TextureMap.end()) continue;
-					if (texture->GetSlotFileName(0) == nullptr) continue;
+					if (texture->GetSlotFileName(0) == nullptr) { // skip if no slot file name
+						m_Reporter.Write(texture, m_StringLoader.LoadStringU8(IDS_EXPLAYOUT_TEX_NO_SLOT_FNAME).c_str());
+						continue;
+					}
 
 					// fetch associated texture path from virtools with given encoding
 					std::filesystem::path texture_path(YYCC::FsPathPatch::FromUTF8Path(
@@ -289,12 +301,12 @@ namespace vtobjplugin {
 			// use current name.
 			// if fail to convert encoding, fallback to use generated name.
 			if (!YYCC::EncodingHelper::CharToUTF8(ckobj_name, ret, m_ExportSetting.GetCompositionEncoding())) {
-				m_Reporter.Write(ckobj, YYCC_U8("Fail to convert its name by given encoding. Use generated name instead."));
+				m_Reporter.Write(ckobj, m_StringLoader.LoadStringU8(IDS_EXPLAYOUT_NAME_CONV_FAIL).c_str());
 				ret = GenerateCKObjectName(ckobj);
 			}
 		} else {
 			// generate one
-			m_Reporter.Write(ckobj, YYCC_U8("Unamed object. Use generated name."));
+			m_Reporter.Write(ckobj, m_StringLoader.LoadStringU8(IDS_EXPLAYOUT_NAME_UNAMED).c_str());
 			ret = GenerateCKObjectName(ckobj);
 		}
 
