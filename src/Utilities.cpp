@@ -146,7 +146,11 @@ namespace vtobjplugin::Utilities {
 
 	void GetNormalTransformMatrix(const VxMatrix& object_transform, VxMatrix& result) {
 		VxMatrix cache;
-		Vx3DInverseMatrix44(cache, object_transform);
+		// MARK: Virtools 3.0 do not support Vx3DInverseMatrix44()
+		// So I use Vx3DInverseMatrix instead.
+		// I think object transform may also suit for Vx3DInverseMatrix assumption.
+		//Vx3DInverseMatrix44(cache, object_transform);
+		Vx3DInverseMatrix(cache, object_transform);
 		Vx3DTransposeMatrix(result, cache);
 	}
 
