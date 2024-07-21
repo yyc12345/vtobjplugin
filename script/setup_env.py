@@ -2,7 +2,7 @@ import vs_props_writer
 import argparse
 import os
 
-def main():
+def main() -> None:
     # define argument parser
     parser = argparse.ArgumentParser(description='Virtools OBJ Exporter Build Environment Maker')
     parser.add_argument(
