@@ -29,6 +29,8 @@
 #define IDS_EXPLAYOUT_NAME_CONV_FAIL    128
 #define IDS_EXPALYOUT_NAME_UNAMED       129
 #define IDS_EXPLAYOUT_NAME_UNAMED       129
+#define IDS_UE_TITLE                    130
+#define IDS_UE_BODY                     131
 #define IDC_RADIO1                      1001
 #define IDC_RADIO2                      1002
 #define IDC_RADIO3                      1003

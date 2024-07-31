@@ -16,4 +16,5 @@ For texture file path, it is done in both `ExportLayoutWeaver` and `ObjExport`. 
 
 * Dialog left-bottom corner version string (all languages, current is English and Simplified Chinese).
 * About dialog string in string table (also for all languages).
+* Version info in resource file (also for all languages).
 * Version indentifier passed to `YYCC::ConfigManager::CoreManager` constructor in `ConfigManager.cpp` if config file structure has been changed when bumping version.

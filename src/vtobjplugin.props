@@ -3,7 +3,7 @@
 	<ImportGroup Label="PropertySheets"/>
 	<PropertyGroup Label="UserMacros">
 		<VIRTOOLS_PATH>E:\Virtools\Virtools Dev 5.0</VIRTOOLS_PATH>
-		<YYCC_PATH>J:\YYCCommonplace\bin\install</YYCC_PATH>
+		<YYCC_PATH>J:\YYCCommonplace\bin\msvc_install</YYCC_PATH>
 	</PropertyGroup>
 	<PropertyGroup/>
 	<ItemDefinitionGroup/>

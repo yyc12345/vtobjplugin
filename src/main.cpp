@@ -20,7 +20,7 @@ public:
 	virtual BOOL InitInstance() override {
 		// register unhandler exception handler
 #ifdef VTOBJ_RELEASE
-		YYCC::ExceptionHelper::Register();
+		YYCC::ExceptionHelper::Register(vtobjplugin::VirtoolsMenu::UnhandledExceptionCallback);
 #endif
 
 		// load config from file

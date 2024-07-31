@@ -25,8 +25,8 @@ LANGUAGE LANG_CHINESE, SUBLANG_NEUTRAL
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,0,0,0
- PRODUCTVERSION 3,0,0,0
+ FILEVERSION 3,1,0,0
+ PRODUCTVERSION 3,1,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -43,12 +43,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "yyc12345"
             VALUE "FileDescription", "用于 Virtools 的 Wavefront OBJ 导出器。"
-            VALUE "FileVersion", "3.0.0.0"
+            VALUE "FileVersion", "3.1.0.0"
             VALUE "InternalName", "vtobjplu.dll"
             VALUE "LegalCopyright", "版权所有 (C) 2020-2024 yyc12345"
             VALUE "OriginalFilename", "vtobjplu.dll"
             VALUE "ProductName", "vtobjplugin"
-            VALUE "ProductVersion", "3.0.0.0"
+            VALUE "ProductVersion", "3.1.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -109,7 +109,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,230,383,107,14,ES_AUTOHSCROLL
     CONTROL         "在物体和材质文件中使用 UTF8",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,402,123,10
     CONTROL         "在脚本文件中使用 UTF8",IDC_CHECK12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,420,99,10
-    LTEXT           "vtobjplugin - v3.0",IDC_STATIC,6,444,58,8
+    LTEXT           "vtobjplugin - v3.1",IDC_STATIC,6,444,58,8
     PUSHBUTTON      "重置为默认",IDC_BUTTON2,6,462,50,14
 END
 
@@ -157,7 +157,7 @@ BEGIN
     IDS_VTMENU_MENU_REPORT_BUG "汇报错误"
     IDS_VTMENU_MENU_ABOUT   "关于 vtobjplugin"
     IDS_VTMENU_ABOUT_TITLE  "关于 vtobjplugin"
-    IDS_VTMENU_ABOUT_BODY   "vtobjplugin v3.0 - 适用于 Virtools 的 Wavefront OBJ 导出器。\n基于 GPL v3 许可证。\n项目主页: https://github.com/yyc12345/vtobjplugin"
+    IDS_VTMENU_ABOUT_BODY   "vtobjplugin v3.1 - 适用于 Virtools 的 Wavefront OBJ 导出器。\n基于 GPL v3 许可证。\n项目主页: https://github.com/yyc12345/vtobjplugin"
     IDS_VTMENU_SUCCESS_NOTE "Wavefront OBJ 导出完成。"
     IDS_EXPSETDLG_ERR_TITLE "设置错误"
 END
@@ -186,6 +186,8 @@ STRINGTABLE
 BEGIN
     IDS_EXPLAYOUT_NAME_CONV_FAIL "无法以给定编码转换其名称。因此使用生成的名称替代。"
     IDS_EXPLAYOUT_NAME_UNAMED "未命名物体。使用生成的名称。"
+    IDS_UE_TITLE            "致命错误"
+    IDS_UE_BODY             "发生了致命错误。报告已生成。请报告给开发者。\n日志路径: %s\n核心转储路径: %s"
 END
 
 #endif    // Chinese (Simplified) resources
@@ -241,8 +243,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,0,0,0
- PRODUCTVERSION 3,0,0,0
+ FILEVERSION 3,1,0,0
+ PRODUCTVERSION 3,1,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -259,12 +261,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "yyc12345"
             VALUE "FileDescription", "Wavefront OBJ Exporter for Virtools."
-            VALUE "FileVersion", "3.0.0.0"
+            VALUE "FileVersion", "3.1.0.0"
             VALUE "InternalName", "vtobjplu.dll"
             VALUE "LegalCopyright", "Copyright (C) 2020-2024 yyc12345"
             VALUE "OriginalFilename", "vtobjplu.dll"
             VALUE "ProductName", "vtobjplugin"
-            VALUE "ProductVersion", "3.0.0.0"
+            VALUE "ProductVersion", "3.1.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -330,7 +332,7 @@ BEGIN
     CONTROL         "Use UTF8 in Object and Material File",IDC_CHECK11,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,402,131,10
     CONTROL         "Use UTF8 in Script File",IDC_CHECK12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,420,87,10
-    LTEXT           "vtobjplugin - v3.0",IDC_STATIC,6,444,58,8
+    LTEXT           "vtobjplugin - v3.1",IDC_STATIC,6,444,58,8
     PUSHBUTTON      "Reset",IDC_BUTTON2,6,462,50,14
 END
 
@@ -378,7 +380,7 @@ BEGIN
     IDS_VTMENU_MENU_REPORT_BUG "Report Bug"
     IDS_VTMENU_MENU_ABOUT   "About vtobjplugin"
     IDS_VTMENU_ABOUT_TITLE  "About vtobjplugin"
-    IDS_VTMENU_ABOUT_BODY   "vtobjplugin v3.0 - A Wavefront OBJ Exporter for Virtools.\nUnder GPL v3 License.\nProject Home Page: https://github.com/yyc12345/vtobjplugin"
+    IDS_VTMENU_ABOUT_BODY   "vtobjplugin v3.1 - A Wavefront OBJ Exporter for Virtools.\nUnder GPL v3 License.\nProject Home Page: https://github.com/yyc12345/vtobjplugin"
     IDS_VTMENU_SUCCESS_NOTE "Wavefront OBJ Export Done."
     IDS_EXPSETDLG_ERR_TITLE "Setting Error"
 END
@@ -410,6 +412,8 @@ BEGIN
     IDS_EXPLAYOUT_NAME_CONV_FAIL 
                             "Fail to convert its name by given encoding. Use generated name instead."
     IDS_EXPLAYOUT_NAME_UNAMED "Unamed object. Use generated name."
+    IDS_UE_TITLE            "Fatal Error"
+    IDS_UE_BODY             "Fatal error occurs. Report is generated. Please report to developer.\nLog path: %s\nCore dump path: %s"
 END
 
 #endif    // English (United States) resources

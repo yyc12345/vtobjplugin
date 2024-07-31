@@ -118,5 +118,15 @@ namespace vtobjplugin::VirtoolsMenu {
 		return g_Plugininterface;
 	}
 
+	void UnhandledExceptionCallback(const YYCC::yycc_u8string& log_path, const YYCC::yycc_u8string& coredump_path) {
+		const auto& string_loader = Utilities::StringLoader::GetSingleton();
+		MessageBoxW(
+			NULL,
+			YYCC::EncodingHelper::UTF8ToWchar(YYCC::StringHelper::Printf(string_loader.LoadStringU8(IDS_UE_BODY).c_str(), log_path.c_str(), coredump_path.c_str()).c_str()).c_str(),
+			string_loader.LoadStringW(IDS_UE_TITLE).c_str(),
+			MB_OK + MB_ICONERROR
+		);
+	}
+
 
 }

@@ -7,4 +7,6 @@ namespace vtobjplugin::VirtoolsMenu {
 	PluginInfo* GetPluginInfo();
 	PluginInterface* GetPluginInterface();
 
+	void UnhandledExceptionCallback(const YYCC::yycc_u8string& log_path, const YYCC::yycc_u8string& coredump_path);
+
 }
