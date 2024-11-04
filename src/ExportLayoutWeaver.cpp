@@ -220,7 +220,7 @@ namespace vtobjplugin {
 						// get material
 						CKMaterial* material = mesh->GetMaterial(i);
 						if (material == nullptr) continue;
-						if (file.m_MaterialMap.find(material) != file.m_MaterialMap.end()) continue;
+						if (YYCC::StdPatch::Contains(file.m_MaterialMap, material)) continue;
 
 						// get name
 						YYCC::yycc_u8string ckobj_name(GetCKObjectName(material));
@@ -247,19 +247,19 @@ namespace vtobjplugin {
 					// get texture and validate it.
 					CKTexture* texture = pair.first->GetTexture();
 					if (texture == nullptr) continue;
-					if (m_TextureMap.find(texture) != m_TextureMap.end()) continue;
+					if (YYCC::StdPatch::Contains(m_TextureMap, texture)) continue;
 					if (texture->GetSlotFileName(0) == nullptr) { // skip if no slot file name
 						m_Reporter.Write(texture, m_StringLoader.LoadStringU8(IDS_EXPLAYOUT_TEX_NO_SLOT_FNAME).c_str());
 						continue;
 					}
 
 					// fetch associated texture path from virtools with given encoding
-					std::filesystem::path texture_path(YYCC::FsPathPatch::FromUTF8Path(
-						YYCC::EncodingHelper::CharToUTF8(texture->GetSlotFileName(0), m_ExportSetting.GetCompositionEncoding()).c_str()
+					std::filesystem::path texture_path(YYCC::StdPatch::ToStdPath(
+						YYCC::EncodingHelper::CharToUTF8(texture->GetSlotFileName(0), m_ExportSetting.GetCompositionEncoding())
 					));
 					// extract stem and extension part from given path
-					YYCC::yycc_u8string filename_stem(YYCC::FsPathPatch::ToUTF8Path(texture_path.stem())),
-						filename_extension(YYCC::FsPathPatch::ToUTF8Path(texture_path.extension()));
+					YYCC::yycc_u8string filename_stem(YYCC::StdPatch::ToUTF8Path(texture_path.stem())),
+						filename_extension(YYCC::StdPatch::ToUTF8Path(texture_path.extension()));
 
 					// correct stem part of given file.
 					// because file name also need to be written in mtl file

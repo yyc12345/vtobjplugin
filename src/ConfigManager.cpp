@@ -16,8 +16,8 @@ namespace vtobjplugin {
 		if (!YYCC::WinFctHelper::GetModuleFileName(NULL, u8_virtools_path))
 			u8_virtools_path.clear();
 		// get its parent folder and append with cfg file name
-		std::filesystem::path virtools_path(YYCC::FsPathPatch::FromUTF8Path(u8_virtools_path.c_str()));
-		return YYCC::FsPathPatch::ToUTF8Path(virtools_path.parent_path() / YYCC::FsPathPatch::FromUTF8Path(YYCC_U8("vtobjplugin.cfg")));
+		std::filesystem::path virtools_path(YYCC::StdPatch::ToStdPath(u8_virtools_path));
+		return YYCC::StdPatch::ToUTF8Path(virtools_path.parent_path() / YYCC::StdPatch::ToStdPath(YYCC_U8("vtobjplugin.cfg")));
 	}
 
 #define INIT_HELPER(name) name(YYCC_U8( #name ), g_DefaultExportSetting.name)

@@ -36,8 +36,6 @@ namespace vtobjplugin::Utilities {
 #define RADIOBTN_GETCHECK(instance) (instance.GetCheck() == BST_CHECKED)
 #define RADIOBTN_SETCHECK(instance, stmt) (instance.SetCheck((stmt) ? BST_CHECKED : BST_UNCHECKED))
 
-	bool ValidateCodePage(UINT code_page);
-
 	void SetCWndText(CWnd* ctl, const YYCC::yycc_u8string_view& val);
 	YYCC::yycc_u8string GetCWndText(CWnd* ctl);
 

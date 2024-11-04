@@ -394,7 +394,7 @@ namespace vtobjplugin {
 			m_Reporter.Write(m_StringLoader.LoadStringU8(IDS_OBJEXP_ERR_TEMP_DIR).c_str());
 			return;
 		}
-		std::filesystem::path temp_directory(YYCC::FsPathPatch::FromUTF8Path(u8_temp_directory.c_str()));
+		std::filesystem::path temp_directory(YYCC::StdPatch::ToStdPath(u8_temp_directory));
 
 		// iterate texture list
 		for (const auto& texture : m_ExportLayoutWeaver.GetTextureMap()) {
@@ -402,34 +402,32 @@ namespace vtobjplugin {
 			// get texture file name and replace its stem to our GUID
 			// because we want to keep its extension 
 			// which Virtools rely on it to decide the file type it should output.
-			auto temp_file = temp_directory / YYCC::FsPathPatch::FromUTF8Path(YYCC_U8("fc57c274-7f05-4e89-bbf0-678ad31c6774")); // a random generated GUID for this app
-			temp_file.replace_extension(YYCC::FsPathPatch::FromUTF8Path(texture.second.c_str()).extension());
+			auto temp_file = temp_directory / YYCC::StdPatch::ToStdPath(YYCC_U8("fc57c274-7f05-4e89-bbf0-678ad31c6774")); // a random generated GUID for this app
+			temp_file.replace_extension(YYCC::StdPatch::ToStdPath(texture.second).extension());
 
-			// get temp file wchar style and ascii style
-			auto u8_temp_file = YYCC::FsPathPatch::ToUTF8Path(temp_file);
+			// get utf8 style and ascii type of temp file.
+			auto u8_temp_file = YYCC::StdPatch::ToUTF8Path(temp_file);
 			std::string acp_temp_file;
-			std::wstring w_temp_file;
-			if (!YYCC::EncodingHelper::UTF8ToChar(u8_temp_file, acp_temp_file, CP_ACP) ||
-				!YYCC::EncodingHelper::UTF8ToWchar(u8_temp_file, w_temp_file)) {
+			if (!YYCC::EncodingHelper::UTF8ToChar(u8_temp_file, acp_temp_file, CP_ACP)) {
 				m_Reporter.Format(m_StringLoader.LoadStringU8(IDS_OBJEXP_ERR_TEMP_TEX).c_str(), u8_temp_file.c_str());
 				continue;
 			}
 
-			// get destination file path and wchar style
+			// get utf8 destination file path
 			auto u8_dest_file = GetExportFilePath(texture.second);
-			std::wstring w_dest_file;
-			if (!YYCC::EncodingHelper::UTF8ToWchar(u8_dest_file, w_dest_file)) {
-				m_Reporter.Format(m_StringLoader.LoadStringU8(IDS_OBJEXP_ERR_TEX).c_str(), u8_dest_file.c_str());
-				continue;
-			}
 
 			// save it by virtools function
 			texture.first->SaveImage(const_cast<CKSTRING>(acp_temp_file.c_str()));
 
-			// use W style Windows function 
-			// to move saved texture to destination.
-			DeleteFileW(w_dest_file.c_str());
-			MoveFileW(w_temp_file.c_str(), w_dest_file.c_str());
+			// use utf8 function (underlying function is Windows W function) to move it to destination.
+			// delete destination file first to make sure move can work.
+			YYCC::WinFctHelper::DeleteFile(u8_dest_file);
+			// move it and check result.
+			if (!YYCC::WinFctHelper::MoveFile(u8_temp_file, u8_dest_file)) {
+				m_Reporter.Format(m_StringLoader.LoadStringU8(IDS_OBJEXP_ERR_TEX).c_str(), u8_dest_file.c_str());
+				continue;
+			}
+
 		}
 	}
 
@@ -529,10 +527,10 @@ namespace vtobjplugin {
 	YYCC::yycc_u8string ObjExporter::GetExportFilePath(const YYCC::yycc_u8string_view& filename) {
 		// get export firectory
 		std::filesystem::path export_directory(
-			YYCC::FsPathPatch::FromUTF8Path(m_ExportSetting.m_ExportDirectory.c_str())
+			YYCC::StdPatch::ToStdPath(m_ExportSetting.m_ExportDirectory)
 		);
 		// get full path output
-		return YYCC::FsPathPatch::ToUTF8Path(export_directory / YYCC::FsPathPatch::FromUTF8Path(filename.data()));
+		return YYCC::StdPatch::ToUTF8Path(export_directory / YYCC::StdPatch::ToStdPath(filename));
 	}
 
 #pragma endregion

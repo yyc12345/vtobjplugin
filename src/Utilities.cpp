@@ -113,11 +113,6 @@ namespace vtobjplugin::Utilities {
 
 #pragma endregion
 
-	bool ValidateCodePage(UINT code_page) {
-		CPINFOEXW cpinfo;
-		return GetCPInfoExW(code_page, 0, &cpinfo);
-	}
-
 	void SetCWndText(CWnd* ctl, const YYCC::yycc_u8string_view& val) {
 		ctl->SetWindowTextA(YYCC::EncodingHelper::UTF8ToChar(val, CP_ACP).c_str());
 	}

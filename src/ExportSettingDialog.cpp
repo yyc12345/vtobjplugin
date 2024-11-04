@@ -184,7 +184,7 @@ namespace vtobjplugin {
 			// only check custom encoding when it is enabled
 			if (RADIOBTN_GETCHECK(m_CompositionEncoding_Custom)) {
 				YYCC::yycc_u8string custom_encoding_strl(Utilities::GetCWndText(&m_CustomEncoding));
-				if (custom_encoding_strl.empty() || !YYCC::ParserHelper::TryParse<UINT>(custom_encoding_strl, custom_encoding) || !Utilities::ValidateCodePage(custom_encoding)) {
+				if (custom_encoding_strl.empty() || !YYCC::ParserHelper::TryParse<UINT>(custom_encoding_strl, custom_encoding) || !YYCC::WinFctHelper::IsValidCodePage(custom_encoding)) {
 					MessageBoxW(m_hWnd, string_loader.LoadStringW(IDS_EXPSETDLG_ERR_INVALID_CP).c_str(), errmsg_title.c_str(), MB_OK + MB_ICONERROR);
 					return;
 				}

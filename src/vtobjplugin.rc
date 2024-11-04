@@ -43,12 +43,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "yyc12345"
             VALUE "FileDescription", "用于 Virtools 的 Wavefront OBJ 导出器。"
-            VALUE "FileVersion", "3.1.0.0"
+            VALUE "FileVersion", "3.2.0.0"
             VALUE "InternalName", "vtobjplu.dll"
             VALUE "LegalCopyright", "版权所有 (C) 2020-2024 yyc12345"
             VALUE "OriginalFilename", "vtobjplu.dll"
             VALUE "ProductName", "vtobjplugin"
-            VALUE "ProductVersion", "3.1.0.0"
+            VALUE "ProductVersion", "3.2.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -109,7 +109,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,230,383,107,14,ES_AUTOHSCROLL
     CONTROL         "在物体和材质文件中使用 UTF8",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,402,123,10
     CONTROL         "在脚本文件中使用 UTF8",IDC_CHECK12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,420,99,10
-    LTEXT           "vtobjplugin - v3.1",IDC_STATIC,6,444,58,8
+    LTEXT           "vtobjplugin - v3.2",IDC_STATIC,6,444,58,8
     PUSHBUTTON      "重置为默认",IDC_BUTTON2,6,462,50,14
 END
 
@@ -157,7 +157,7 @@ BEGIN
     IDS_VTMENU_MENU_REPORT_BUG "汇报错误"
     IDS_VTMENU_MENU_ABOUT   "关于 vtobjplugin"
     IDS_VTMENU_ABOUT_TITLE  "关于 vtobjplugin"
-    IDS_VTMENU_ABOUT_BODY   "vtobjplugin v3.1 - 适用于 Virtools 的 Wavefront OBJ 导出器。\n基于 GPL v3 许可证。\n项目主页: https://github.com/yyc12345/vtobjplugin"
+    IDS_VTMENU_ABOUT_BODY   "vtobjplugin v3.2 - 适用于 Virtools 的 Wavefront OBJ 导出器。\n基于 GPL v3 许可证。\n项目主页: https://github.com/yyc12345/vtobjplugin"
     IDS_VTMENU_SUCCESS_NOTE "Wavefront OBJ 导出完成。"
     IDS_EXPSETDLG_ERR_TITLE "设置错误"
 END
@@ -175,7 +175,7 @@ BEGIN
     IDS_OBJEXP_ERR_BLD_SCRIPT "无法创建 Blender 脚本文件: ""%s""。"
     IDS_OBJEXP_ERR_TEMP_DIR "无法获取 Windows 临时路径，因此无法复制贴图。"
     IDS_OBJEXP_ERR_TEMP_TEX "无法获取临时贴图目录: ""%s""。跳过此贴图的复制。"
-    IDS_OBJEXP_ERR_TEX      "无法获取贴图目录: ""%s""。跳过此贴图的复制。"
+    IDS_OBJEXP_ERR_TEX      "无法复制贴图: ""%s""。跳过此贴图的复制。"
     IDS_UNAME_RENAME        "由于名称唯一性，名称 ""%s"" 已被重命名为 ""%s""。"
     IDS_EXPLAYOUT_OBJ_NO_MESH "3D 物体不包含网格。跳过导出。"
     IDS_EXPLAYOUT_MESH_NO_FACE "关联的网格不含有任何面。跳过导出。"
@@ -261,12 +261,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "yyc12345"
             VALUE "FileDescription", "Wavefront OBJ Exporter for Virtools."
-            VALUE "FileVersion", "3.1.0.0"
+            VALUE "FileVersion", "3.2.0.0"
             VALUE "InternalName", "vtobjplu.dll"
             VALUE "LegalCopyright", "Copyright (C) 2020-2024 yyc12345"
             VALUE "OriginalFilename", "vtobjplu.dll"
             VALUE "ProductName", "vtobjplugin"
-            VALUE "ProductVersion", "3.1.0.0"
+            VALUE "ProductVersion", "3.2.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -332,7 +332,7 @@ BEGIN
     CONTROL         "Use UTF8 in Object and Material File",IDC_CHECK11,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,402,131,10
     CONTROL         "Use UTF8 in Script File",IDC_CHECK12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,420,87,10
-    LTEXT           "vtobjplugin - v3.1",IDC_STATIC,6,444,58,8
+    LTEXT           "vtobjplugin - v3.2",IDC_STATIC,6,444,58,8
     PUSHBUTTON      "Reset",IDC_BUTTON2,6,462,50,14
 END
 
@@ -380,7 +380,7 @@ BEGIN
     IDS_VTMENU_MENU_REPORT_BUG "Report Bug"
     IDS_VTMENU_MENU_ABOUT   "About vtobjplugin"
     IDS_VTMENU_ABOUT_TITLE  "About vtobjplugin"
-    IDS_VTMENU_ABOUT_BODY   "vtobjplugin v3.1 - A Wavefront OBJ Exporter for Virtools.\nUnder GPL v3 License.\nProject Home Page: https://github.com/yyc12345/vtobjplugin"
+    IDS_VTMENU_ABOUT_BODY   "vtobjplugin v3.2 - A Wavefront OBJ Exporter for Virtools.\nUnder GPL v3 License.\nProject Home Page: https://github.com/yyc12345/vtobjplugin"
     IDS_VTMENU_SUCCESS_NOTE "Wavefront OBJ Export Done."
     IDS_EXPSETDLG_ERR_TITLE "Setting Error"
 END
@@ -398,7 +398,7 @@ BEGIN
     IDS_OBJEXP_ERR_BLD_SCRIPT "Fail to create Blender script file: ""%s""."
     IDS_OBJEXP_ERR_TEMP_DIR "Fail to get Windows temp path, thus we can not copy texture."
     IDS_OBJEXP_ERR_TEMP_TEX "Fail to get temporary texture path: ""%s"". Skip copying this texture."
-    IDS_OBJEXP_ERR_TEX      "Fail to get texture path: ""%s"". Skip copying this texture."
+    IDS_OBJEXP_ERR_TEX      "Fail to copy texture: ""%s"". Skip copying this texture."
     IDS_UNAME_RENAME        "Name ""%s"" was renamed to ""%s"" for unique name."
     IDS_EXPLAYOUT_OBJ_NO_MESH "3D Object doesn't have mesh. Skip exporting."
     IDS_EXPLAYOUT_MESH_NO_FACE 
